@@ -11,6 +11,7 @@ import sys,os
 import dbus
 import dbus.service
 import dbus.mainloop.glib
+from hostclient import Client
 
 app = None
 bus = None
@@ -56,12 +57,10 @@ class App:
 	
 	def add_pid(self,pid):
 		
-		remote = bus.get_object("org.ude.components.client_"+str(pid),"/org/ude/components/client")
-		xid = remote.Prepare(dbus_interface="org.ude.components.client")
+		client = Client(bus,pid)
+		xid = client.Prepare()
 		
 		socket = gtk.Socket()
-		if None == socket.get_window():
-			socket.realize()
 		socket.show()
 		
 		self.notebook.append_page(socket,gtk.Label(str(pid)))
