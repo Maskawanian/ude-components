@@ -23,6 +23,8 @@ class App:
 	button = None
 	notebook = None
 	
+	clients = []
+	
 	def __init__(self):
 		glade_prefix = ""
 		try:
@@ -39,10 +41,18 @@ class App:
 		self.button = self.builder.get_object("button")
 		self.notebook = self.builder.get_object("notebook")
 		
+		self.button.connect("clicked",self.do_add_pid_clicked)
+		
 		self.window.show_all()
 		
 		
 		pass
+	
+	def do_add_pid_clicked(self,sender):
+		print "do_add_pid_clicked"
+		self.add_pid(int(self.entry.get_text()))
+		pass
+	
 	
 	def add_pid(self,pid):
 		
