@@ -52,11 +52,20 @@ class App:
 			subprocess.Popen(['setsid',path_python,path_host_script,"-a",str(os.getpid())],env=env,stdout=fd,stderr=fd)
 		else:
 			print "connect to host"
-			remotehost = bus.get_object("org.ude.components.client_"+str(arg_host),"/org/ude/components/client")
 			
+			host_bus_name = "org.ude.components.host_"+str(arg_host)
+			if False == bus.name_has_owner(host_bus_name):
+				raise Exception("The bus `"+host_bus_name+"` does not exist.")
 			
-			
+			remotehost = bus.get_object(host_bus_name,"/org/ude/components/host")
+			remotehost.AddPID(os.getpid(),dbus_interface="org.ude.components.host",reply_handler=self.add_pid_reply,error_handler=self.add_pid_reply_error)
 		pass
+	
+	def add_pid_reply(self): #stub
+		pass
+	
+	def add_pid_reply_error(self,e):
+		raise Exception("Error when communicating with the host: {0}".format(e))
 	
 	def prepare(self):
 		'''
