@@ -76,22 +76,40 @@ class Client:
 		return False
 	
 	def Prepare(self):
-		return self.remote.Prepare(dbus_interface="org.ude.components.client")
+		try:
+			return self.remote.Prepare(dbus_interface="org.ude.components.client")
+		except:
+			return None
 	
 	def AllowClose(self):
-		return self.remote.AllowClose(dbus_interface="org.ude.components.client")
+		try:
+			return self.remote.AllowClose(dbus_interface="org.ude.components.client")
+		except:
+			return True
 	
 	def ShowAllowClosePrompt(self):
-		return self.remote.ShowAllowClosePrompt(dbus_interface="org.ude.components.client")
+		try:
+			self.remote.ShowAllowClosePrompt(dbus_interface="org.ude.components.client")
+		except:
+			pass
 	
 	def ClosedByHost(self):
-		return self.remote.ClosedByHost(dbus_interface="org.ude.components.client")
+		try:
+			self.remote.ClosedByHost(dbus_interface="org.ude.components.client")
+		except:
+			pass
 	
 	def GetTitle(self):
-		return self.remote.GetTitle(dbus_interface="org.ude.components.client")
+		try:
+			return self.remote.GetTitle(dbus_interface="org.ude.components.client")
+		except:
+			return ""
 	
 	def GetProxyIconPath(self):
-		return self.remote.GetProxyIconPath(dbus_interface="org.ude.components.client")
+		try:
+			return self.remote.GetProxyIconPath(dbus_interface="org.ude.components.client")
+		except:
+			return ""
 
 
 
