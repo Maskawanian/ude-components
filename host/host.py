@@ -74,6 +74,13 @@ class App:
 		pass
 	
 	def do_window_delete_event(self,sender,event):
+		
+		# Tell all the clients to quit.
+		for client in self.clients:
+			client.ClosedByHost()
+		
+		
+		
 		gtk.main_quit()
 		return False
 		#return True # Stop Delete
@@ -94,7 +101,6 @@ class App:
 		self.notebook.append_page(client.widget,hbox)
 	
 	def remove_pid(self,pid):
-		i = 0
 		for client in self.clients:
 			self.notebook.remove_page(self.notebook.page_num(client.widget))
 			del client
