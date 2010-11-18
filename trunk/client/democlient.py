@@ -22,10 +22,21 @@ def main():
 	# DBus
 	print "Client PID",os.getpid()
 	
-	client = ComponentClient(args.host)
+	client = DemoClient(args.host)
 	gtk.main()
 	pass
 
+class DemoClient(ComponentClient):
+	def prepare_new_widget(self):
+		ret = gtk.Button("demo client")
+		ret.connect("clicked",self.button_press)
+		return ret
+	
+	def button_press(self,sender):
+		print "click"
+		pass
+	
+	
 if __name__ == "__main__":
 	main()
 
