@@ -60,12 +60,12 @@ class App:
 		
 		self.window = self.builder.get_object("window")
 		
-		self.entry = self.builder.get_object("entry")
-		self.button = self.builder.get_object("button")
+		#self.entry = self.builder.get_object("entry")
+		#self.button = self.builder.get_object("button")
 		self.notebook = self.builder.get_object("notebook")
 		
 		self.window.connect("delete-event",self.do_window_delete_event)
-		self.button.connect("clicked",self.do_add_pid_clicked)
+		#self.button.connect("clicked",self.do_add_pid_clicked)
 		
 		self.window.show_all()
 		

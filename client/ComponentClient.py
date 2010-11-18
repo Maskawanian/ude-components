@@ -74,13 +74,8 @@ class ComponentClient:
 		return self.plug.get_id()
 	
 	def prepare_new_widget(self):
-		ret = gtk.Button("button")
-		ret.connect("clicked",self.button_press)
+		ret = gtk.Button("Default Widget")
 		return ret
-	
-	def button_press(self,sender):
-		#self.prepare()
-		pass
 	
 	def allow_close(self):
 		print "allow_close()"
