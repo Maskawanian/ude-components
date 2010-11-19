@@ -11,13 +11,16 @@ prefix_glade_host = "/home/dan/Desktop/Programming/ude/ude-components/host/"
 path_python = "/usr/bin/python2"
 path_host_script = "/home/dan/Desktop/Programming/ude/ude-components/host/host.py"
 
-class ComponentClient:
+class ComponentClient(object):
 	bus = None
 	bus_name = None
 	bus_obj = None
 	
 	widget = None # Widget that will be embeded.
 	plug = None   
+	
+	__title = "untitled {0}".format(os.getpid())
+	__proxy_icon_path = "/home/dan/Desktop/Programming/ude/ude-components/client/16x16doc.svg"
 	
 	def __init__(self,hostPID):
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -91,10 +94,19 @@ class ComponentClient:
 		pass
 	
 	def get_title(self):
-		return "untitled {0}".format(os.getpid())
+		return self.__title
+	
+	def set_title(self,title):
+		if None != title:
+			self.__title = title
+			self.bus_obj.TitleChanged(self.__title)
 	
 	def get_proxy_icon_path(self):
-		return "/home/dan/Desktop/Programming/ude/ude-components/client/16x16doc.svg"
+		return self.__proxy_icon_path
+	
+	def set_proxy_icon_path(self,path):
+		self.__proxy_icon_path = path
+		self.bus_obj.ProxyIconChanged(self.__proxy_icon_path)
 		
 	
 class ComponentClientDBus(dbus.service.Object):
