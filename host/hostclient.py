@@ -23,6 +23,9 @@ class Client:
 	
 	has_remote = False
 	
+	title = None
+	proxy_icon_path = None
+	
 	def __init__(self,bus,pid):
 		try:
 			self.glade_prefix = os.environ["GLADE_PREFIX"]
@@ -31,6 +34,8 @@ class Client:
 		
 		self.bus = bus
 		self.remote = self.bus.get_object("org.ude.components.client_"+str(pid),"/org/ude/components/client")
+		self.remote.connect_to_signal("TitleChanged",self.__TitleChanged_cb)
+		self.remote.connect_to_signal("ProxyIconChanged",self.__ProxyIconChanged_cb)
 		
 		self.builder = gtk.Builder()
 		self.builder.add_from_file(self.glade_prefix+"hostclient.glade")
@@ -41,10 +46,11 @@ class Client:
 		
 		self.image = gtk.Image()
 		self.image.set_size_request(16,16)
-		self.image.set_from_file(self.GetProxyIconPath())
+		path = self.GetProxyIconPath()
+		self.__ProxyIconChanged_cb(path)
 		
 		self.label = gtk.Label()
-		self.label.set_text(self.GetTitle())
+		self.__TitleChanged_cb(self.GetTitle())
 		
 		img = gtk.Image()
 		img.set_size_request(12,12)
@@ -101,15 +107,30 @@ class Client:
 	
 	def GetTitle(self):
 		try:
-			return self.remote.GetTitle(dbus_interface="org.ude.components.client")
+			self.title = self.remote.GetTitle(dbus_interface="org.ude.components.client")
+			return self.title
 		except:
 			return ""
+	
+	def __TitleChanged_cb(self,title):
+		self.title = title
+		self.label.set_text(self.title)
 	
 	def GetProxyIconPath(self):
 		try:
 			return self.remote.GetProxyIconPath(dbus_interface="org.ude.components.client")
 		except:
 			return ""
+	
+	def __ProxyIconChanged_cb(self,path):
+		self.proxy_icon_path = path
+		if self.proxy_icon_path.endswith((".gif",".apng",".mng")):
+			anim = gtk.gdk.PixbufAnimation(self.proxy_icon_path)
+			self.image.set_from_animation(anim)
+		else:
+			pb = gtk.gdk.pixbuf_new_from_file_at_size(self.proxy_icon_path,16,16)
+			self.image.set_from_pixbuf(pb)
+		pass
 
 
 
