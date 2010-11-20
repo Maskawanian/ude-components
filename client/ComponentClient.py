@@ -20,7 +20,7 @@ class ComponentClient(object):
 	plug = None   
 	
 	__title = "untitled {0}".format(os.getpid())
-	__proxy_icon_path = "/home/dan/Desktop/Programming/ude/ude-components/client/16x16doc.svg"
+	__proxy_icon_path = "/usr/share/ude/components/16x16doc.svg"
 	
 	def __init__(self,hostPID):
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
