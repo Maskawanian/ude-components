@@ -143,14 +143,14 @@ class WebClient(ComponentClient):
 					self.__favicon_path = None
 			
 			if status != webkit.LOAD_FINISHED:
-				self.set_proxy_icon_path("/home/dan/Desktop/Programming/ude/ude-components/loader.gif")
+				self.set_proxy_icon_path("/usr/share/ude/components/loading.gif")
 			else:
 				# Set the Icon used for the tab.
 				path = None
 				if None != self.__favicon_path:
 					path = self.__favicon_path
 				else:
-					path = "/home/dan/Desktop/Programming/ude/ude-components/client/16x16doc.svg"
+					path = "/usr/share/ude/components/16x16doc.svg"
 				self.set_proxy_icon_path(path)
 				
 				# Set the address bar's icon.
@@ -159,8 +159,14 @@ class WebClient(ComponentClient):
 					anim = gtk.gdk.PixbufAnimation(path)
 					i.set_from_animation(anim)
 				else:
-					pb = gtk.gdk.pixbuf_new_from_file_at_size(path,16,16)
+					print "path",path
+					pb = None
+					try:
+						pb = gtk.gdk.pixbuf_new_from_file_at_size(path,16,16)
+					except:
+						pb = gtk.gdk.pixbuf_new_from_file_at_size("/usr/share/ude/components/16x16doc.svg",16,16)
 					i.set_from_pixbuf(pb)
+					
 				
 				
 		elif pspec.name == "title":

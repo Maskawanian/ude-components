@@ -1,0 +1,29 @@
+# This is an example PKGBUILD file. Use this as a start to creating your own,
+# and remove these comments. For more information, see 'man PKGBUILD'.
+# NOTE: Please fill out the license field for your package! If it is unknown,
+# then please put 'unknown'.
+
+# Maintainer: Dan Saul aur by cryingwolf at org
+pkgname=ude-components-media
+_datever=20101119
+_miniver=1
+pkgver=$_datever.$_miniver
+pkgrel=1
+pkgdesc="Media for ude-components"
+arch=(any)
+url="http://code.google.com/p/ude-components"
+license=('cc-by-nc-sa')
+source=(12x12close.svg 16x16doc.svg hostclient-crash.svg loading.gif)
+
+md5sums=('3a96c082115191dbe496bae043f26f13'
+         'cb7bf81471be4a6e7d8da6f22c39b932'
+         'd9e1716da8b5e7999f24a76b810a2c8e'
+         '5dd5a34240bd06c62447bbfd1727346c')
+
+build() {
+	mkdir -p $pkgdir/usr/share/ude/components
+	cp $srcdir/*.svg $pkgdir/usr/share/ude/components
+	cp $srcdir/*.gif $pkgdir/usr/share/ude/components
+}
+
+

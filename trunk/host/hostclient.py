@@ -54,7 +54,7 @@ class Client:
 		
 		img = gtk.Image()
 		img.set_size_request(12,12)
-		img.set_from_file("/home/dan/Desktop/Programming/ude/ude-components/host/12x12close.svg")
+		img.set_from_file("/usr/share/ude/components/12x12close.svg")
 		self.closebutton = gtk.ToolButton(img)
 		
 		
@@ -128,7 +128,11 @@ class Client:
 			anim = gtk.gdk.PixbufAnimation(self.proxy_icon_path)
 			self.image.set_from_animation(anim)
 		else:
-			pb = gtk.gdk.pixbuf_new_from_file_at_size(self.proxy_icon_path,16,16)
+			pb = None
+			try:
+				pb = gtk.gdk.pixbuf_new_from_file_at_size(self.proxy_icon_path,16,16)
+			except:
+				pb = gtk.gdk.pixbuf_new_from_file_at_size("/usr/share/ude/components/16x16doc.svg",16,16)
 			self.image.set_from_pixbuf(pb)
 		pass
 
