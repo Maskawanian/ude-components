@@ -13,12 +13,13 @@ pkgdesc="Media for ude-components"
 arch=(any)
 url="http://code.google.com/p/ude-components"
 license=('cc-by-nc-sa')
-source=(12x12close.svg 16x16doc.svg hostclient-crash.svg loading.gif)
+source=(12x12close.svg 16x16doc.svg hostclient-crash.svg loading.gif spacer.gif)
 
 md5sums=('3a96c082115191dbe496bae043f26f13'
          'cb7bf81471be4a6e7d8da6f22c39b932'
          'd9e1716da8b5e7999f24a76b810a2c8e'
-         '5dd5a34240bd06c62447bbfd1727346c')
+         '5dd5a34240bd06c62447bbfd1727346c'
+         'db04c7b378cb2db912c3ba8a5a774ee3')
 
 build() {
 	mkdir -p $pkgdir/usr/share/ude/components
