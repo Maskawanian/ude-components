@@ -4,7 +4,7 @@ import urllib,urlparse
 import sexy
 import webkit
 
-from ComponentClient import ComponentClient
+import Components.Client
 from WebViewTab import WebViewTab
 
 # Fix missing variables in pywebkit.
@@ -14,7 +14,7 @@ webkit.LOAD_FINISHED = 2
 webkit.LOAD_FIRST_VISUALLY_NON_EMPTY_LAYOUT = 3
 webkit.LOAD_FAILED = 4
 
-class WebClient(ComponentClient):
+class WebClient(Components.Client.base):
 	
 	tlds = ["aero","asia","biz","cat","com","coop",\
 		"edu","gov","info","int","jobs","mil","mobi",\
