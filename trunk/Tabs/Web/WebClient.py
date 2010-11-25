@@ -85,7 +85,7 @@ class WebClient(Components.Client.base):
 		self.set_title("blank page")
 		
 		self.__adblock = AdBlock()
-		self.__adblock.add_file('/home/dan/Desktop/Programming/ude/ude-components/client/web/easylist.txt')
+		self.__adblock.add_file('/home/dan/Desktop/Programming/ude/ude-components/Tabs/Web/easylist.txt')
 		
 		
 		
