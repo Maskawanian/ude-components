@@ -6,6 +6,7 @@ import webkit
 
 import Components.Client
 from WebViewTab import WebViewTab
+from AdBlock import AdBlock
 
 # Fix missing variables in pywebkit.
 webkit.LOAD_PROVISIONAL = 0
@@ -53,10 +54,7 @@ class WebClient(Components.Client.base):
 		"xn--xkc2al3hye2a","xn--kprw13d","xn--kpry57d",\
 		"xn--o3cw4h","xn--pgbs0dh","xn--mgbaam7a8h"]
 	
-	__adblock_rules_uri = []
-	__adblock_rules_uri_exceptions = []
-	__adblock_rules_element = []
-	__adblock_rules_element_exceptions = []
+	__adblock = None
 	
 	__glade_prefix = ""
 	__glade_builder = gtk.Builder()
@@ -86,26 +84,11 @@ class WebClient(Components.Client.base):
 		
 		self.set_title("blank page")
 		
-		self.parse_adblock_fitlers()
+		self.__adblock = AdBlock()
+		self.__adblock.add_file('/home/dan/Desktop/Programming/ude/ude-components/client/web/easylist.txt')
 		
-		pass
-	
-	def parse_adblock_fitlers(self):
-		f = open('/home/dan/Desktop/Programming/ude/ude-components/client/web/easylist.txt', 'r')
-		for line in f:
-			if line.find("!") != -1:
-				# Comment
-				pass
-			elif line.find("##") != -1:
-				if line.find("@@") != -1:
-					self.__adblock_rules_element_exceptions.append(line.strip())
-				else:
-					self.__adblock_rules_element.append(line.strip())
-			else:
-				if line.find("@@") != -1:
-					self.__adblock_rules_uri_exceptions.append(line.strip())
-				else:
-					self.__adblock_rules_uri.append(line.strip())
+		
+		
 		pass
 	
 	def prepare_new_widget(self):
@@ -255,43 +238,10 @@ class WebClient(Components.Client.base):
 	
 	def __wv_resource_request_starting(self,webview,web_frame,web_resource,request,response):
 		uri = request.get_uri()
-		#scheme, netloc, path, params, query, fragment = urlparse.urlparse(uri)
-		#scheme, netloc, path, params, query, fragment, username, password, hostname, port = \
-		#	urlparse.urlparse(request.get_uri())
-		
-		for rule in self.__adblock_rules_uri:
-			if self.__uri_matches_rule(uri,rule):
-				request.set_uri("about:blank")
-		
-		
-		
-		
-		
-		#if netloc == "www.google-analytics.com":
-		#	request.set_uri("about:blank")
-		
-		#file:///usr/share/ude/components/spacer.gif
-		
-		#print "__wv_resource_request_starting",scheme, netloc, path, params, query, fragment
-		pass
+		if self.__adblock.block(uri):
+			request.set_uri("about:blank")
 	
-	def __uri_matches_rule(self,uri,rule):
-		
-		#print "__uri_matches_rule",rule
-		
-		if rule.find("*") != -1 or rule.find("^") != -1 or rule.find("|") != -1 or rule.find("~") != -1:
-			
-			pass
-		#elif regex:
-		else:
-			return self.__uri_matches_rule_simple(uri,rule)
-		
-		
-		return False
 	
-	def __uri_matches_rule_simple(self,uri,rule):
-		#print rule
-		return False
 
 
 
