@@ -91,7 +91,7 @@ class WebClient(Components.Client.base):
 		pass
 	
 	def parse_adblock_fitlers(self):
-		f = open('/home/dan/Desktop/Programming/ude/ude-components/client/easylist.txt', 'r')
+		f = open('/home/dan/Desktop/Programming/ude/ude-components/client/web/easylist.txt', 'r')
 		for line in f:
 			if line.find("!") != -1:
 				# Comment
