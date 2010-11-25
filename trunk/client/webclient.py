@@ -37,14 +37,6 @@ def main():
 	pass
 
 class WebClient(ComponentClient):
-	__toolbar = None
-	__wv = None
-	__back_button = None
-	__forward_button = None
-	__reload_button = None
-	__stop_button = None
-	__uri_entry = None
-	__favicon_path = None
 	
 	tlds = ["aero","asia","biz","cat","com","coop",\
 		"edu","gov","info","int","jobs","mil","mobi",\
@@ -88,8 +80,32 @@ class WebClient(ComponentClient):
 	__adblock_rules_element = []
 	__adblock_rules_element_exceptions = []
 	
+	__glade_prefix = ""
+	__glade_builder = gtk.Builder()
+	
+	__outerbox = None
+	__tb = None
+	__tb_back = None
+	__tb_forward = None
+	__tb_reload = None
+	__tb_stop = None
+	__tb_address = None
+	__tb_address_entry = None
+	__tb_address_entry_image = None
+	
+	__wv = None
+	__wv_sw = None
+	
+	__favicon_path = None
+	
 	def __init__(self,hostPID):
 		super(WebClient, self).__init__(hostPID)
+		
+		try:
+			self.__glade_prefix = os.environ["GLADE_PREFIX"]
+		except KeyError:
+			print "No Glade Environment"
+		
 		self.set_title("blank page")
 		
 		self.parse_adblock_fitlers()
@@ -115,70 +131,58 @@ class WebClient(ComponentClient):
 		pass
 	
 	def prepare_new_widget(self):
-		self.toolbar = gtk.Toolbar()
 		
-		self.__back_button = gtk.ToolButton()
-		im = gtk.image_new_from_stock(gtk.STOCK_GO_BACK,2)
-		self.__back_button.set_icon_widget(im)
-		self.__back_button.connect("clicked",self.__tb_back_button_clicked)
-		self.toolbar.insert(self.__back_button,-1)
+		self.__glade_builder = gtk.Builder()
+		self.__glade_builder.add_from_file(self.__glade_prefix+"webclient.glade")
 		
-		self.__forward_button = gtk.ToolButton()
-		im = gtk.image_new_from_stock(gtk.STOCK_GO_FORWARD,2)
-		self.__forward_button.set_icon_widget(im)
-		self.__forward_button.connect("clicked",self.__tb_forward_button_clicked)
-		self.toolbar.insert(self.__forward_button,-1)
+		self.__outerbox = self.__glade_builder.get_object("outerbox")
+		self.__tb = self.__glade_builder.get_object("toolbar")
 		
-		self.__reload_button = gtk.ToolButton()
-		im = gtk.image_new_from_stock(gtk.STOCK_REFRESH,2)
-		self.__reload_button.set_icon_widget(im)
-		self.__reload_button.connect("clicked",self.__tb_reload_button_clicked)
-		self.toolbar.insert(self.__reload_button,-1)
+		self.__tb_back = gtk.ToolButton(gtk.STOCK_GO_BACK)
+		self.__tb_back.connect("clicked",self.__tb_back_clicked)
+		self.__tb.insert(self.__tb_back,-1)
 		
-		self.__stop_button = gtk.ToolButton()
-		im = gtk.image_new_from_stock(gtk.STOCK_STOP,2)
-		self.__stop_button.set_icon_widget(im)
-		self.__stop_button.connect("clicked",self.__tb_stop_button_clicked)
-		self.toolbar.insert(self.__stop_button,-1)
+		self.__tb_forward = gtk.ToolButton(gtk.STOCK_GO_FORWARD)
+		self.__tb_forward.connect("clicked",self.__tb_forward_clicked)
+		self.__tb.insert(self.__tb_forward,-1)
 		
-		tb = gtk.ToolItem()
-		tb.set_expand(True)
-		im = gtk.image_new_from_file("/usr/share/ude/components/16x16doc.svg")
-		self.__uri_entry = sexy.IconEntry()
-		self.__uri_entry.set_icon(sexy.ICON_ENTRY_PRIMARY,im)
-		self.__uri_entry.connect("activate",self.__uri_entry_activate)
-		tb.add(self.__uri_entry)
-		self.toolbar.insert(tb,-1)
+		self.__tb_reload = gtk.ToolButton(gtk.STOCK_REFRESH)
+		self.__tb_reload.connect("clicked",self.__tb_reload_clicked)
+		self.__tb.insert(self.__tb_reload,-1)
 		
-		#tb = gtk.ToolButton()
-		#im = gtk.image_new_from_stock(gtk.STOCK_ABOUT,2)
-		#tb.set_icon_widget(im)
-		#self.toolbar.insert(tb,-1)
+		self.__tb_stop = gtk.ToolButton(gtk.STOCK_STOP)
+		self.__tb_stop.connect("clicked",self.__tb_stop_clicked)
+		self.__tb.insert(self.__tb_stop,-1)
 		
-		#tb = gtk.ToolButton()
-		#im = gtk.image_new_from_stock(gtk.STOCK_PROPERTIES,2)
-		#tb.set_icon_widget(im)
-		#self.toolbar.insert(tb,-1)
+		self.__tb_address = gtk.ToolItem()
+		self.__tb_address.set_expand(True)
+		self.__tb_address_entry = sexy.IconEntry()
+		self.__tb_address_entry_image = gtk.image_new_from_file("/usr/share/ude/components/16x16doc.svg")
+		self.__tb_address_entry.set_icon(sexy.ICON_ENTRY_PRIMARY,self.__tb_address_entry_image)
+		self.__tb_address_entry.connect("activate",self.__tb_address_entry_activate)
+		self.__tb_address.add(self.__tb_address_entry)
+		self.__tb.insert(self.__tb_address,-1)
 		
-		vbox = gtk.VBox()
 		self.__wv = WebViewTab()
-		self.__wv.connect("notify",self.__wv_notify)
+		self.__wv.connect("notify::uri",self.__wv_notify_uri)
+		self.__wv.connect("notify::progress",self.__wv_notify_progress)
+		self.__wv.connect("notify::load-status",self.__wv_notify_load_status)
+		self.__wv.connect("notify::title",self.__wv_notify_title)
+		self.__wv.connect("notify::icon-uri",self.__wv_notify_icon_uri)
+		
 		self.__wv.connect("load-error",self.__wv_load_error)
 		self.__wv.connect("resource-request-starting",self.__wv_resource_request_starting)
 		
-		sw = gtk.ScrolledWindow()
-		sw.add(self.__wv)
 		
-		vbox.pack_start(self.toolbar,expand=False,fill=True)
-		vbox.pack_start(sw,expand=True,fill=True)
+		__wv_sw = gtk.ScrolledWindow()
+		__wv_sw.add(self.__wv)
+		self.__outerbox.pack_start(__wv_sw,expand=True,fill=True)
 		
-		
-		return vbox
-	#http://www.google.ca/search?&q=pie
-	def __uri_entry_activate(self,sender):
-		text = self.__uri_entry.get_text().strip()
+		return self.__outerbox
+	
+	def __tb_address_entry_activate(self,sender):
+		text = self.__tb_address_entry.get_text().strip()
 		if text == None or text == "": return
-		
 		
 		validated_url = None
 		
@@ -188,8 +192,6 @@ class WebClient(ComponentClient):
 				if path == '':
 					raise Exception("scheme netloc and path are all empty...")
 				else:
-					#
-					#
 					if path.startswith("www."):
 						validated_url = "http://"+text
 					else:
@@ -203,87 +205,72 @@ class WebClient(ComponentClient):
 		else:
 			validated_url = text
 		
-		self.__uri_entry.set_text(validated_url)
+		self.__tb_address_entry.set_text(validated_url)
 		self.__wv.load_uri(validated_url)
 		
-		window = self.__uri_entry.get_ancestor(gtk.Window.__gtype__)
+		window = self.__tb_address_entry.get_ancestor(gtk.Window.__gtype__)
 		if None != window: window.set_focus(self.__wv)
-		print "activate",text
 		pass
 	
-	def __tb_back_button_clicked(self,sender):
+	def __tb_back_clicked(self,sender):
 		self.__wv.go_back()
 	
-	def __tb_forward_button_clicked(self,sender):
+	def __tb_forward_clicked(self,sender):
 		self.__wv.go_forward()
 	
-	def __tb_reload_button_clicked(self,sender):
+	def __tb_reload_clicked(self,sender):
 		self.__wv.reload()
 	
-	def __tb_stop_button_clicked(self,sender):
+	def __tb_stop_clicked(self,sender):
 		self.__wv.stop_loading()
 	
+	def __wv_notify_uri(self,sender,arg):
+		self.__tb_address_entry.set_text(self.__wv.get_main_frame().get_uri())
 	
-	def __wv_notify(self,sender,pspec):
-		if pspec.name == "uri":
-			#print self.__wv.get_property("load-status")
-			self.__uri_entry.set_text(self.__wv.get_main_frame().get_uri())
-		elif pspec.name == "progress":
-			print "progress",self.__wv.get_property("progress")
-		elif pspec.name == "load-status":
-			status = self.__wv.get_property("load-status")
-			print "load status",status
-			self.__reload_button.set_sensitive(status == webkit.LOAD_FINISHED)
-			self.__stop_button.set_sensitive(status != webkit.LOAD_FINISHED)
-			
-			# if we are not loading we delete the favicon, this may be a good idea to cache later.
-			if status != webkit.LOAD_FINISHED and status != webkit.LOAD_FIRST_VISUALLY_NON_EMPTY_LAYOUT:
-				if self.__favicon_path != None:
-					os.remove(self.__favicon_path)
-					self.__favicon_path = None
-			
-			if status != webkit.LOAD_FINISHED:
-				self.set_proxy_icon_path("/usr/share/ude/components/loading.gif")
-			else:
-				# Set the Icon used for the tab.
-				path = None
-				if None != self.__favicon_path:
-					path = self.__favicon_path
-				else:
-					path = "/usr/share/ude/components/16x16doc.svg"
-				self.set_proxy_icon_path(path)
-				
-				# Set the address bar's icon.
-				i = self.__uri_entry.get_icon(sexy.ICON_ENTRY_PRIMARY)
-				if path.endswith((".gif",".apng",".mng")):
-					anim = gtk.gdk.PixbufAnimation(path)
-					i.set_from_animation(anim)
-				else:
-					print "path",path
-					pb = None
-					try:
-						pb = gtk.gdk.pixbuf_new_from_file_at_size(path,16,16)
-					except:
-						pb = gtk.gdk.pixbuf_new_from_file_at_size("/usr/share/ude/components/16x16doc.svg",16,16)
-					i.set_from_pixbuf(pb)
-					
-				
-				
-		elif pspec.name == "title":
-			title = self.__wv.get_property("title")
-			self.set_title(title)
-		elif pspec.name == "icon-uri":
-			uri = self.__wv.get_property("icon-uri")
-			filename, headers = urllib.urlretrieve(uri)
-			self.__favicon_path = filename
-		elif pspec.name in ["has-tooltip","has-focus","is-focus","parent","visible","style","window","events"]:
-			pass
+	def __wv_notify_progress(self,sender,arg):
+		print "progress",self.__wv.get_property("progress")
+	
+	def __wv_notify_load_status(self,sender,arg):
+		status = self.__wv.get_property("load-status")
+		print "load status",status
+		self.__tb_reload.set_sensitive(status == webkit.LOAD_FINISHED)
+		self.__tb_stop.set_sensitive(status != webkit.LOAD_FINISHED)
+		
+		# if we are not loading we delete the favicon, this may be a good idea to cache later.
+		if status != webkit.LOAD_FINISHED and status != webkit.LOAD_FIRST_VISUALLY_NON_EMPTY_LAYOUT:
+			if self.__favicon_path != None:
+				os.remove(self.__favicon_path)
+				self.__favicon_path = None
+		
+		if status != webkit.LOAD_FINISHED:
+			self.set_proxy_icon_path("/usr/share/ude/components/loading.gif")
+			self.set_proxy_icon_path("/usr/share/ude/components/16x16doc.svg")
 		else:
-			print "unhandled",pspec.name
+			# Set the Icon used for the tab.
+			path = None
+			if None != self.__favicon_path:
+				path = self.__favicon_path
+			else:
+				path = "/usr/share/ude/components/16x16doc.svg"
+			self.set_proxy_icon_path(path)
+			
+			anim = gtk.gdk.PixbufAnimation(path)
+			
+			pb = gtk.gdk.pixbuf_new_from_file_at_size(path,16,16)
+			self.__tb_address_entry_image.set_from_pixbuf(pb)
 		
 		# Update buttons.
-		self.__back_button.set_sensitive(self.__wv.can_go_back())
-		self.__forward_button.set_sensitive(self.__wv.can_go_forward())
+		self.__tb_back.set_sensitive(self.__wv.can_go_back())
+		self.__tb_forward.set_sensitive(self.__wv.can_go_forward())
+	
+	def __wv_notify_title(self,sender,arg):
+		title = self.__wv.get_property("title")
+		self.set_title(title)
+	
+	def __wv_notify_icon_uri(self,sender,arg):
+		uri = self.__wv.get_property("icon-uri")
+		filename, headers = urllib.urlretrieve(uri)
+		self.__favicon_path = filename
 	
 	def __wv_load_error(self,sender,frame,arg,arg2):
 		print "__wv_load_error",self,sender,frame,arg,arg2
@@ -325,7 +312,7 @@ class WebClient(ComponentClient):
 		return False
 	
 	def __uri_matches_rule_simple(self,uri,rule):
-		print rule
+		#print rule
 		return False
 	
 class WebViewTab(webkit.WebView):
