@@ -11,7 +11,7 @@ prefix_glade_host = "/home/dan/Desktop/Programming/ude/ude-components/host/"
 path_python = "/usr/bin/python2"
 path_host_script = "/home/dan/Desktop/Programming/ude/ude-components/host/host.py"
 
-class ComponentClient(object):
+class base(object):
 	bus = None
 	bus_name = None
 	bus_obj = None

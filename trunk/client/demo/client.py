@@ -3,11 +3,9 @@
 
 import sys,os,argparse
 import gobject,pygtk,gtk,gio
-import dbus,dbus.service,dbus.mainloop.glib
-import subprocess,threading
 gobject.threads_init ()
 
-from ComponentClient import ComponentClient
+from DemoClient import DemoClient
 
 client = None
 
@@ -24,18 +22,7 @@ def main():
 	
 	client = DemoClient(args.host)
 	gtk.main()
-	pass
-
-class DemoClient(ComponentClient):
-	def prepare_new_widget(self):
-		ret = gtk.Button("demo client")
-		ret.connect("clicked",self.button_press)
-		return ret
-	
-	def button_press(self,sender):
-		print "click"
-		pass
-	
+	pass	
 	
 if __name__ == "__main__":
 	main()
