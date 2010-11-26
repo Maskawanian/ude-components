@@ -5,7 +5,7 @@ import sys,os,argparse
 import gobject,pygtk,gtk,gio
 import dbus,dbus.service,dbus.mainloop.glib
 from HostClient import Client
-from UnsavedChanges import UnsavedChanges
+from UnsavedChangesHandler import UnsavedChangesHandler
 
 app = None
 bus = None
@@ -69,7 +69,7 @@ class Host(object):
 			self.add_pid(arg_add)
 		pass
 	
-	__unsaved_changes = None#UnsavedChanges
+	__uch = None
 	def do_window_delete_event(self,sender,event):
 		deny_close = False
 		clients_denying_close = []
@@ -81,6 +81,7 @@ class Host(object):
 				clients_denying_close.append(client)
 				deny_close = True
 		
+		self.__uch = UnsavedChangesHandler()
 		
 		if deny_close:
 			return True # Stop Delete
