@@ -4,7 +4,6 @@
 import sys,os
 import gobject,pygtk,gtk,gio
 gobject.threads_init ()
-gtk.gdk.threads_init()
 import dbus,dbus.service,dbus.mainloop.glib
 
 class Client:

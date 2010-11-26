@@ -5,6 +5,7 @@ import sys,os,argparse
 import gobject,pygtk,gtk,gio
 import dbus,dbus.service,dbus.mainloop.glib
 from hostclient import Client
+from UnsavedChanges import UnsavedChanges
 
 app = None
 bus = None
@@ -35,7 +36,7 @@ def main():
 	gtk.main()
 	pass
 
-class App:
+class App(object):
 	glade_prefix = ""
 	
 	builder = None
@@ -56,7 +57,7 @@ class App:
 			print "No Glade Environment"
 		
 		self.builder = gtk.Builder()
-		self.builder.add_from_file(self.glade_prefix+"host.glade")
+		self.builder.add_from_file(self.glade_prefix+"Host.glade")
 		
 		self.window = self.builder.get_object("window")
 		self.notebook = self.builder.get_object("notebook")
@@ -68,17 +69,28 @@ class App:
 			self.add_pid(arg_add)
 		pass
 	
+	__unsaved_changes = None#UnsavedChanges
 	def do_window_delete_event(self,sender,event):
+		deny_close = False
+		clients_denying_close = []
+		
+		# Check for any clients that can't just be closed.
+		for client in self.clients:
+			d = client.AllowClose()
+			if not d:
+				clients_denying_close.append(client)
+				deny_close = True
+		
+		
+		if deny_close:
+			return True # Stop Delete
 		
 		# Tell all the clients to quit.
 		for client in self.clients:
 			client.ClosedByHost()
 		
-		
-		
 		gtk.main_quit()
 		return False
-		#return True # Stop Delete
 	
 	def do_add_pid_clicked(self,sender):
 		self.add_pid(int(self.entry.get_text()))
