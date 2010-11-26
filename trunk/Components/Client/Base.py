@@ -9,7 +9,7 @@ gobject.threads_init ()
 
 prefix_glade_host = "/home/dan/Desktop/Programming/ude/ude-components/host/"
 path_python = "/usr/bin/python2"
-path_host_script = "/home/dan/Desktop/Programming/ude/ude-components/host/Host.py"
+path_host_script = "/home/dan/Desktop/Programming/ude/ude-components/Host/Host.py"
 
 class Base(object):
 	bus = None
