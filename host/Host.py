@@ -4,7 +4,7 @@
 import sys,os,argparse
 import gobject,pygtk,gtk,gio
 import dbus,dbus.service,dbus.mainloop.glib
-from hostclient import Client
+from HostClient import Client
 from UnsavedChanges import UnsavedChanges
 
 app = None
@@ -32,11 +32,11 @@ def main():
 	print "Host PID",os.getpid()
 	
 	
-	app = App()
+	app = Host()
 	gtk.main()
 	pass
 
-class App(object):
+class Host(object):
 	glade_prefix = ""
 	
 	builder = None

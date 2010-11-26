@@ -37,7 +37,7 @@ class Client:
 		self.remote.connect_to_signal("ProxyIconChanged",self.__ProxyIconChanged_cb)
 		
 		self.builder = gtk.Builder()
-		self.builder.add_from_file(self.glade_prefix+"hostclient.glade")
+		self.builder.add_from_file(self.glade_prefix+"HostClient.glade")
 		
 		self.widget = gtk.VBox()
 		self.widget.add_events(gtk.gdk.STRUCTURE_MASK)
