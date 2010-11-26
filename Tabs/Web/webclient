@@ -1,2 +1,2 @@
 #!/bin/sh
-PYTHONPATH=$PYTHONPATH:../../ python2 client.py "$@"
+PYTHONPATH=$PYTHONPATH:../../ python2 main.py "$@"
