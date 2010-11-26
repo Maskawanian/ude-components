@@ -7,7 +7,7 @@ import dbus,dbus.service,dbus.mainloop.glib
 import subprocess,threading
 gobject.threads_init ()
 
-prefix_glade_host = "/home/dan/Desktop/Programming/ude/ude-components/host/"
+prefix_glade_host = "/home/dan/Desktop/Programming/ude/ude-components/Host/"
 path_python = "/usr/bin/python2"
 path_host_script = "/home/dan/Desktop/Programming/ude/ude-components/Host/Host.py"
 
@@ -23,7 +23,8 @@ class Base(object):
 	__proxy_icon_path = "/usr/share/ude/components/16x16doc.svg"
 	
 	def __init__(self,hostPID):
-		super(Base, self).__init__()
+		#super(Base, self).__init__()
+		print "init",hostPID
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		self.bus = dbus.SessionBus()
 		self.bus_name = dbus.service.BusName("org.ude.components.client_"+str(os.getpid()), self.bus)
