@@ -15,7 +15,7 @@ webkit.LOAD_FINISHED = 2
 webkit.LOAD_FIRST_VISUALLY_NON_EMPTY_LAYOUT = 3
 webkit.LOAD_FAILED = 4
 
-class WebClient(Components.Client.base):
+class WebClient(Components.Client.Base):
 	
 	tlds = ["aero","asia","biz","cat","com","coop",\
 		"edu","gov","info","int","jobs","mil","mobi",\

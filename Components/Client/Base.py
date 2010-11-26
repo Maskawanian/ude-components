@@ -11,7 +11,7 @@ prefix_glade_host = "/home/dan/Desktop/Programming/ude/ude-components/host/"
 path_python = "/usr/bin/python2"
 path_host_script = "/home/dan/Desktop/Programming/ude/ude-components/host/host.py"
 
-class base(object):
+class Base(object):
 	bus = None
 	bus_name = None
 	bus_obj = None
@@ -23,6 +23,7 @@ class base(object):
 	__proxy_icon_path = "/usr/share/ude/components/16x16doc.svg"
 	
 	def __init__(self,hostPID):
+		super(Base, self).__init__()
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		self.bus = dbus.SessionBus()
 		self.bus_name = dbus.service.BusName("org.ude.components.client_"+str(os.getpid()), self.bus)
@@ -123,6 +124,15 @@ class ComponentClientDBus(dbus.service.Object):
 	@dbus.service.method(dbus_interface='org.ude.components.client', out_signature='b')
 	def AllowClose(self):
 		return self.realobj.allow_close()
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	@dbus.service.method(dbus_interface='org.ude.components.client')
 	def ShowAllowClosePrompt(self):
