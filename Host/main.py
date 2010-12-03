@@ -3,10 +3,6 @@
 
 import sys,os,argparse
 import gobject,pygtk,gtk,gio
-import dbus,dbus.service,dbus.mainloop.glib
-from HostClient import Client
-from UnsavedChangesHandler import UnsavedChangesHandler
-import Components.Client
 from Host import Host
 
 app = None
