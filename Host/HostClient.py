@@ -86,17 +86,17 @@ class Client:
 		except:
 			return None
 	
-	def AllowClose(self):
+	def SaveStatus(self):
 		try:
-			return self.remote.AllowClose(dbus_interface="org.ude.components.client")
+			return self.remote.SaveStatus(dbus_interface="org.ude.components.client")
 		except:
-			return True
+			return 0
 	
-	def ShowAllowClosePrompt(self):
+	def GetDescription(self):
 		try:
-			self.remote.ShowAllowClosePrompt(dbus_interface="org.ude.components.client")
+			return self.remote.GetDescription(dbus_interface="org.ude.components.client")
 		except:
-			pass
+			return "No Description"
 	
 	def ClosedByHost(self):
 		try:

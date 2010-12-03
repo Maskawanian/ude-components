@@ -23,8 +23,8 @@ class Base(object):
 	__proxy_icon_path = "/usr/share/ude/components/16x16doc.svg"
 	
 	def __init__(self,hostPID):
-		#super(Base, self).__init__()
-		print "init",hostPID
+		super(Base, self).__init__()
+		
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		self.bus = dbus.SessionBus()
 		self.bus_name = dbus.service.BusName("org.ude.components.client_"+str(os.getpid()), self.bus)
@@ -34,7 +34,8 @@ class Base(object):
 			fd = os.open(os.devnull, os.O_RDWR)
 			env = os.environ.copy()
 			env["GLADE_PREFIX"] = prefix_glade_host
-			subprocess.Popen(['setsid',path_python,path_host_script,"-a",str(os.getpid())],env=env,stdout=fd,stderr=fd)
+			#subprocess.Popen(['setsid',path_python,path_host_script,"-a",str(os.getpid())],env=env,stdout=fd,stderr=fd)
+			subprocess.Popen(['setsid',path_python,path_host_script,"-a",str(os.getpid())],env=env)
 		else:
 			print "connect to host"
 			
@@ -82,13 +83,12 @@ class Base(object):
 		ret = gtk.Button("Default Widget")
 		return ret
 	
-	def allow_close(self):
-		print "allow_close()"
-		return True
+	def save_status(self):
+		print "save_status()"
+		return Components.Client.SAVE_STATUS_SAVED
 	
-	def show_allow_close_prompt(self):
-		print "show_allow_close_prompt()"
-		pass
+	def get_description(self):
+		return "PID {0}".format(os.getpid())
 	
 	def closed_by_host(self):
 		print "closed_by_host()"
@@ -122,26 +122,13 @@ class ComponentClientDBus(dbus.service.Object):
 	def Prepare(self):
 		return self.realobj.prepare()
 	
-	@dbus.service.method(dbus_interface='org.ude.components.client', out_signature='b')
-	def AllowClose(self):
-		return self.realobj.allow_close()
+	@dbus.service.method(dbus_interface='org.ude.components.client', out_signature='i')
+	def SaveStatus(self):
+		return self.realobj.save_status()
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	@dbus.service.method(dbus_interface='org.ude.components.client')
-	def ShowAllowClosePrompt(self):
-		self.realobj.show_allow_close_prompt()
-	
-	@dbus.service.method(dbus_interface='org.ude.components.client')
-	def ClosedByHost(self):
-		self.realobj.closed_by_host()
+	@dbus.service.method(dbus_interface='org.ude.components.client', out_signature='s')
+	def GetDescription(self):
+		return self.realobj.get_description()
 	
 	@dbus.service.method(dbus_interface='org.ude.components.client', out_signature='s')
 	def GetTitle(self):
@@ -158,6 +145,30 @@ class ComponentClientDBus(dbus.service.Object):
 	@dbus.service.signal(dbus_interface='org.ude.components.client', signature='s')
 	def ProxyIconChanged(self, path):
 		pass
+	
+	@dbus.service.method(dbus_interface='org.ude.components.client')
+	def ClosedByHost(self):
+		self.realobj.closed_by_host()
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 
 

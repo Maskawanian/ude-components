@@ -3,7 +3,6 @@ import gobject,pygtk,gtk
 import Components.Client
 
 class DemoClient(Components.Client.Base):
-	allow_close = False
 	
 	def __init__(self,hostPID):
 		super(DemoClient, self).__init__(hostPID)
@@ -15,8 +14,8 @@ class DemoClient(Components.Client.Base):
 	
 	def button_press(self,sender):
 		print "click"
-		allow_close = True
 		pass
 	
-	def allow_close(self):
-		return allow_close
+	def save_status(self):
+		print "save_status()"
+		return Components.Client.SAVE_STATUS_NOT_SAVED
