@@ -5,6 +5,7 @@ import sys,os,argparse
 import gobject,pygtk,gtk,gio
 import dbus,dbus.service,dbus.mainloop.glib
 import subprocess,threading
+import Components.Client
 gobject.threads_init ()
 
 prefix_glade_host = "/home/dan/Desktop/Programming/ude/ude-components/Host/"
@@ -21,6 +22,7 @@ class Base(object):
 	
 	__title = "untitled {0}".format(os.getpid())
 	__proxy_icon_path = "/usr/share/ude/components/16x16doc.svg"
+	__save_status = 0 # We can't use Components.Client.SAVE_STATUS_SAVED for some reason.
 	
 	def __init__(self,hostPID):
 		super(Base, self).__init__()
@@ -31,7 +33,7 @@ class Base(object):
 		self.bus_obj = ComponentClientDBus(self.bus,'/org/ude/components/client',self)
 		
 		if hostPID == 0:
-			fd = os.open(os.devnull, os.O_RDWR)
+			#fd = os.open(os.devnull, os.O_RDWR)
 			env = os.environ.copy()
 			env["GLADE_PREFIX"] = prefix_glade_host
 			#subprocess.Popen(['setsid',path_python,path_host_script,"-a",str(os.getpid())],env=env,stdout=fd,stderr=fd)
@@ -83,9 +85,13 @@ class Base(object):
 		ret = gtk.Button("Default Widget")
 		return ret
 	
-	def save_status(self):
+	def get_save_status(self):
 		print "save_status()"
-		return Components.Client.SAVE_STATUS_SAVED
+		return self.__save_status
+	
+	def set_save_status(self,status):
+		self.__save_status = status
+		self.bus_obj.SaveStatusChanged(self.__save_status)
 	
 	def get_description(self):
 		return "PID {0}".format(os.getpid())
@@ -123,8 +129,8 @@ class ComponentClientDBus(dbus.service.Object):
 		return self.realobj.prepare()
 	
 	@dbus.service.method(dbus_interface='org.ude.components.client', out_signature='i')
-	def SaveStatus(self):
-		return self.realobj.save_status()
+	def GetSaveStatus(self):
+		return self.realobj.get_save_status()
 	
 	@dbus.service.method(dbus_interface='org.ude.components.client', out_signature='s')
 	def GetDescription(self):
@@ -144,6 +150,10 @@ class ComponentClientDBus(dbus.service.Object):
 	
 	@dbus.service.signal(dbus_interface='org.ude.components.client', signature='s')
 	def ProxyIconChanged(self, path):
+		pass
+	
+	@dbus.service.signal(dbus_interface='org.ude.components.client', signature='i')
+	def SaveStatusChanged(self, save_status):
 		pass
 	
 	@dbus.service.method(dbus_interface='org.ude.components.client')
