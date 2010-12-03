@@ -85,7 +85,7 @@ class Base(object):
 		ret = gtk.Button("Default Widget")
 		return ret
 	
-	def closed_by_host(self):
+	def notify_closed_by_host(self):
 		print "closed_by_host()"
 		gtk.main_quit()
 		pass
@@ -130,8 +130,8 @@ class ComponentClientDBus(dbus.service.Object):
 		return self.realobj.prepare()
 	
 	@dbus.service.method(dbus_interface='org.ude.components.client')
-	def ClosedByHost(self):
-		self.realobj.closed_by_host()
+	def NotifyClosedByHost(self):
+		self.realobj.notify_closed_by_host()
 	
 	@dbus.service.method(dbus_interface='org.ude.components.client', out_signature='i')
 	def GetSaveStatus(self):

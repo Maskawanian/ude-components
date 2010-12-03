@@ -100,7 +100,7 @@ class Host(object):
 		
 		# Tell all the clients to quit.
 		for client in self.clients:
-			client.ClosedByHost()
+			client.NotifyClosedByHost()
 		
 		gtk.main_quit()
 		return False

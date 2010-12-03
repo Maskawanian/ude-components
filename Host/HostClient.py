@@ -106,11 +106,14 @@ class Client:
 		except:
 			return "No Description"
 	
-	def ClosedByHost(self):
-		try:
-			self.remote.ClosedByHost(dbus_interface="org.ude.components.client")
-		except:
-			pass
+	def NotifyClosedByHost(self):
+		self.remote.NotifyClosedByHost(dbus_interface="org.ude.components.client",
+									   reply_handler=self.__cb_closed_by_host_stub,
+									   error_handler=self.__cb_closed_by_host_stub_e)
+	def __cb_closed_by_host_stub(self):
+		pass
+	def __cb_closed_by_host_stub_e(self,error):
+		pass
 	
 	def GetTitle(self):
 		try:
