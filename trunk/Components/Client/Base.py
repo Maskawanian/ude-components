@@ -85,6 +85,11 @@ class Base(object):
 		ret = gtk.Button("Default Widget")
 		return ret
 	
+	def closed_by_host(self):
+		print "closed_by_host()"
+		gtk.main_quit()
+		pass
+	
 	def get_save_status(self):
 		print "save_status()"
 		return self.__save_status
@@ -95,11 +100,7 @@ class Base(object):
 	
 	def get_description(self):
 		return "PID {0}".format(os.getpid())
-	
-	def closed_by_host(self):
-		print "closed_by_host()"
-		gtk.main_quit()
-		pass
+
 	
 	def get_title(self):
 		return self.__title
@@ -128,6 +129,10 @@ class ComponentClientDBus(dbus.service.Object):
 	def Prepare(self):
 		return self.realobj.prepare()
 	
+	@dbus.service.method(dbus_interface='org.ude.components.client')
+	def ClosedByHost(self):
+		self.realobj.closed_by_host()
+	
 	@dbus.service.method(dbus_interface='org.ude.components.client', out_signature='i')
 	def GetSaveStatus(self):
 		return self.realobj.get_save_status()
@@ -155,10 +160,6 @@ class ComponentClientDBus(dbus.service.Object):
 	@dbus.service.signal(dbus_interface='org.ude.components.client', signature='i')
 	def SaveStatusChanged(self, save_status):
 		pass
-	
-	@dbus.service.method(dbus_interface='org.ude.components.client')
-	def ClosedByHost(self):
-		self.realobj.closed_by_host()
 	
 	
 	
