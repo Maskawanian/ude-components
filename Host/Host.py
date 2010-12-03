@@ -1,9 +1,6 @@
 # See LICENCE for the source code licence.
 # (c) 2010 Dan Saul
 
-
-
-
 import sys,os,argparse
 import gobject,pygtk,gtk,gio
 import dbus,dbus.service,dbus.mainloop.glib
@@ -27,11 +24,7 @@ def main():
 	arg_add = args.add
 	print arg_add
 	
-	# DBus
-	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-	bus = dbus.SessionBus ()
-	name = dbus.service.BusName("org.ude.components.host_"+str(os.getpid()), bus)
-	dbusobj = Example(bus, '/org/ude/components/host')
+	 
 	
 	print "Host PID",os.getpid()
 	
@@ -41,6 +34,11 @@ def main():
 	pass
 
 class Host(object):
+	bus = None
+	bus_name = None
+	bus_service_name = None
+	bus_obj = None
+	
 	glade_prefix = ""
 	
 	builder = None
@@ -56,6 +54,13 @@ class Host(object):
 	
 	def __init__(self):
 		super(Host, self).__init__()
+		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+		
+		self.bus = dbus.SessionBus()
+		self.bus_name = "org.ude.components.host_"+str(os.getpid())
+		self.bus_service_name = dbus.service.BusName(self.bus_name, self.bus)
+		self.bus_obj = ComponentHostDBus(self.bus, '/org/ude/components/host', self)
+		
 		try:
 			self.glade_prefix = os.environ["GLADE_PREFIX"]
 		except KeyError:
@@ -113,7 +118,7 @@ class Host(object):
 		self.add_pid(int(self.entry.get_text()))
 	
 	def add_pid(self,pid):
-		client = Client(bus,pid,self)
+		client = Client(self.bus,pid,self)
 		self.clients.append(client)
 		
 		hbox = gtk.HBox(spacing=5)
@@ -129,17 +134,21 @@ class Host(object):
 			self.notebook.remove_page(self.notebook.page_num(client.widget))
 			del client
 
-class Example(dbus.service.Object):
-	def __init__(self, bus, object_path):
+	
+class ComponentHostDBus(dbus.service.Object):
+	realobj = None
+	
+	def __init__(self, bus, object_path, realobj):
 		dbus.service.Object.__init__(self, bus, object_path)
+		self.realobj = realobj
 	
 	@dbus.service.method(dbus_interface='org.ude.components.host',in_signature='i')
 	def AddPID(self, pid):
-		app.add_pid(pid)
+		realobj.add_pid(pid)
 	
 	@dbus.service.method(dbus_interface='org.ude.components.host',in_signature='i')
 	def RemovePID(self, pid):
-		app.remove_pid(pid)
+		realobj.remove_pid(pid)
 	
 if __name__ == "__main__":
 	main()
