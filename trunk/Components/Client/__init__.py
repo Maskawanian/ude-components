@@ -1,1 +1,2 @@
 from Base import Base
+SAVE_STATUS_SAVED, SAVE_STATUS_NOT_SAVED, SAVE_STATUS_SAVING = range(3)

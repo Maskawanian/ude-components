@@ -1,11 +1,15 @@
 # See LICENCE for the source code licence.
 # (c) 2010 Dan Saul
 
+
+
+
 import sys,os,argparse
 import gobject,pygtk,gtk,gio
 import dbus,dbus.service,dbus.mainloop.glib
 from HostClient import Client
 from UnsavedChangesHandler import UnsavedChangesHandler
+import Components.Client
 
 app = None
 bus = None
@@ -51,6 +55,7 @@ class Host(object):
 	clients = []
 	
 	def __init__(self):
+		super(Host, self).__init__()
 		try:
 			self.glade_prefix = os.environ["GLADE_PREFIX"]
 		except KeyError:
@@ -76,13 +81,15 @@ class Host(object):
 		
 		# Check for any clients that can't just be closed.
 		for client in self.clients:
-			d = client.AllowClose()
-			if not d:
+			d = client.SaveStatus()
+			if d != Components.Client.SAVE_STATUS_SAVED:
 				clients_denying_close.append(client)
 				deny_close = True
 		
-		self.__uch = UnsavedChangesHandler()
+		self.__uch = UnsavedChangesHandler(clients_denying_close)
+		self.__uch.show(self.window)
 		
+		print "deny_close",deny_close
 		if deny_close:
 			return True # Stop Delete
 		
