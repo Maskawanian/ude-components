@@ -3,7 +3,7 @@
 
 import sys,os,argparse
 import gobject,pygtk,gtk,gio
-from Host import Host
+from TabbedHost import TabbedHost
 
 app = None
 
@@ -19,7 +19,7 @@ def main():
 	
 	print "Host PID",os.getpid()
 	
-	app = Host(arg_add)
+	app = TabbedHost(arg_add)
 	gtk.main()
 	pass
 
