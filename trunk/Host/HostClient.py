@@ -51,16 +51,13 @@ class Client:
 		self.image = gtk.Image()
 		self.image.set_size_request(16,16)
 		path = self.GetProxyIconPath()
-		self.__ProxyIconChanged_cb(path)
 		
 		self.label = gtk.Label()
-		self.__TitleChanged_cb(self.GetTitle())
 		
 		img = gtk.Image()
 		img.set_size_request(12,12)
 		img.set_from_file("/usr/share/ude/components/12x12close.svg")
 		self.closebutton = gtk.ToolButton(img)
-		
 		
 		self.socket = gtk.Socket()
 		self.socket.connect("plug-removed",self.__plug_removed)
@@ -68,6 +65,12 @@ class Client:
 		self.crashbox = self.builder.get_object("crashbox")
 		
 		self.widget.pack_start(self.socket)
+		
+		# Update with initial values.
+		self.__cb_proxy_icon_changed(path)
+		self.__cb_title_changed(self.GetTitle())
+		self.__cb_save_status_changed(self.GetSaveStatus())
+		
 		self.widget.show_all()
 		pass
 	
