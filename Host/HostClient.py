@@ -5,6 +5,7 @@ import sys,os
 import gobject,pygtk,gtk,gio
 gobject.threads_init ()
 import dbus,dbus.service,dbus.mainloop.glib
+import Components.Client
 
 class Client:
 	glade_prefix = ""
@@ -86,11 +87,11 @@ class Client:
 		except:
 			return None
 	
-	def SaveStatus(self):
+	def GetSaveStatus(self):
 		try:
-			return self.remote.SaveStatus(dbus_interface="org.ude.components.client")
+			return self.remote.GetSaveStatus(dbus_interface="org.ude.components.client")
 		except:
-			return 0
+			return Components.Client.SAVE_STATUS_SAVED
 	
 	def GetDescription(self):
 		try:

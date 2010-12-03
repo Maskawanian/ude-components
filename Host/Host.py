@@ -81,7 +81,7 @@ class Host(object):
 		
 		# Check for any clients that can't just be closed.
 		for client in self.clients:
-			d = client.SaveStatus()
+			d = client.GetSaveStatus()
 			if d != Components.Client.SAVE_STATUS_SAVED:
 				clients_denying_close.append(client)
 				deny_close = True
