@@ -5,7 +5,10 @@ import sys,os,argparse
 import gobject,pygtk,gtk,gio
 import dbus,dbus.service,dbus.mainloop.glib
 import subprocess,threading
+
 import Components.Client
+import Components.Host
+
 gobject.threads_init ()
 
 prefix_glade_host = "/home/dan/Desktop/Programming/ude/ude-components/Host/"
@@ -27,10 +30,12 @@ class Base(object):
 	def __init__(self,hostPID):
 		super(Base, self).__init__()
 		
+		
+		
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		self.bus = dbus.SessionBus()
-		self.bus_name = dbus.service.BusName("org.ude.components.client_"+str(os.getpid()), self.bus)
-		self.bus_obj = ComponentClientDBus(self.bus,'/org/ude/components/client',self)
+		self.bus_name = dbus.service.BusName(Components.Client.BUS_INTERFACE_NAME+"_"+str(os.getpid()), self.bus)
+		self.bus_obj = ComponentClientDBus(self.bus,Components.Client.BUS_OBJECT_PATH,self)
 		
 		if hostPID == 0:
 			#fd = os.open(os.devnull, os.O_RDWR)
@@ -41,18 +46,17 @@ class Base(object):
 		else:
 			print "connect to host"
 			
-			host_bus_name = "org.ude.components.host_"+str(hostPID)
+			host_bus_name = Components.Host.BUS_INTERFACE_NAME+"_"+str(hostPID)
 			if False == self.bus.name_has_owner(host_bus_name):
 				raise Exception("The bus `"+host_bus_name+"` does not exist.")
 			
-			remotehost = self.bus.get_object(host_bus_name,"/org/ude/components/host")
-			remotehost.AddPID(os.getpid(),dbus_interface="org.ude.components.host",reply_handler=self.add_pid_reply,error_handler=self.add_pid_reply_error)
+			remotehost = self.bus.get_object(host_bus_name,Components.Host.BUS_OBJECT_PATH)
+			remotehost.AddPID(os.getpid(),dbus_interface=Components.Host.BUS_INTERFACE_NAME,reply_handler=self.__cb_add_pid,error_handler=self.__cb_add_pid_e)
 		pass
 	
-	def add_pid_reply(self): #stub
+	def __cb_add_pid(self): #stub
 		pass
-	
-	def add_pid_reply_error(self,e):
+	def __cb_add_pid_e(self,e):
 		raise Exception("Error when communicating with the host: {0}".format(e))
 	
 	def prepare(self):

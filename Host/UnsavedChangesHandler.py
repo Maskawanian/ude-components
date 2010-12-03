@@ -1,5 +1,6 @@
 import sys,os
 import gobject,pygtk,gtk,gio,pango
+from Components import Client
 gobject.threads_init ()
 
 class UnsavedChangesHandler(object):
