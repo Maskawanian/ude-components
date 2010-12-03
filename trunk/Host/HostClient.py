@@ -5,9 +5,9 @@ import sys,os
 import gobject,pygtk,gtk,gio
 gobject.threads_init ()
 import dbus,dbus.service,dbus.mainloop.glib
-import Components.Client
+from Components import Client
 
-class Client:
+class HostClient(object):
 	glade_prefix = ""
 	
 	bus = None
@@ -28,6 +28,7 @@ class Client:
 	proxy_icon_path = None
 	
 	def __init__(self,bus,pid,delegate):
+		super(HostClient, self).__init__()
 		self.delegate = delegate
 		
 		try:
@@ -36,7 +37,7 @@ class Client:
 			print "No Glade Environment"
 		
 		self.bus = bus
-		self.remote = self.bus.get_object("org.ude.components.client_"+str(pid),"/org/ude/components/client")
+		self.remote = self.bus.get_object(Client.BUS_INTERFACE_NAME+"_"+str(pid),Client.BUS_OBJECT_PATH)
 		self.remote.connect_to_signal("TitleChanged",self.__cb_title_changed)
 		self.remote.connect_to_signal("ProxyIconChanged",self.__cb_proxy_icon_changed)
 		self.remote.connect_to_signal("SaveStatusChanged",self.__cb_save_status_changed)
@@ -90,24 +91,24 @@ class Client:
 	
 	def Prepare(self):
 		try:
-			return self.remote.Prepare(dbus_interface="org.ude.components.client")
+			return self.remote.Prepare(dbus_interface=Client.BUS_INTERFACE_NAME)
 		except:
 			return None
 	
 	def GetSaveStatus(self):
 		try:
-			return self.remote.GetSaveStatus(dbus_interface="org.ude.components.client")
+			return self.remote.GetSaveStatus(dbus_interface=Client.BUS_INTERFACE_NAME)
 		except:
-			return Components.Client.SAVE_STATUS_SAVED
+			return Client.SAVE_STATUS_SAVED
 	
 	def GetDescription(self):
 		try:
-			return self.remote.GetDescription(dbus_interface="org.ude.components.client")
+			return self.remote.GetDescription(dbus_interface=Client.BUS_INTERFACE_NAME)
 		except:
 			return "No Description"
 	
 	def NotifyClosedByHost(self):
-		self.remote.NotifyClosedByHost(dbus_interface="org.ude.components.client",
+		self.remote.NotifyClosedByHost(dbus_interface=Client.BUS_INTERFACE_NAME,
 									   reply_handler=self.__cb_closed_by_host_stub,
 									   error_handler=self.__cb_closed_by_host_stub_e)
 	def __cb_closed_by_host_stub(self):
@@ -117,14 +118,14 @@ class Client:
 	
 	def GetTitle(self):
 		try:
-			self.title = self.remote.GetTitle(dbus_interface="org.ude.components.client")
+			self.title = self.remote.GetTitle(dbus_interface=Client.BUS_INTERFACE_NAME)
 			return self.title
 		except:
 			return ""
 	
 	def GetProxyIconPath(self):
 		try:
-			return self.remote.GetProxyIconPath(dbus_interface="org.ude.components.client")
+			return self.remote.GetProxyIconPath(dbus_interface=Client.BUS_INTERFACE_NAME)
 		except:
 			return ""
 	

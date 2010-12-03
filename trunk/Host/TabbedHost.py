@@ -4,10 +4,10 @@
 import sys,os,argparse
 import gobject,pygtk,gtk,gio
 import dbus,dbus.service,dbus.mainloop.glib
-from HostClient import Client
+from HostClient import HostClient
 from UnsavedChangesHandler import UnsavedChangesHandler
 from ComponentHostDBus import ComponentHostDBus
-import Components.Client
+from Components import Client,Host
 
 class TabbedHost(object):
 	bus = None
@@ -33,9 +33,9 @@ class TabbedHost(object):
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		
 		self.bus = dbus.SessionBus()
-		self.bus_name = "org.ude.components.host_"+str(os.getpid())
+		self.bus_name = Host.BUS_INTERFACE_NAME+"_"+str(os.getpid())
 		self.bus_service_name = dbus.service.BusName(self.bus_name, self.bus)
-		self.bus_obj = ComponentHostDBus(self.bus, '/org/ude/components/host', self)
+		self.bus_obj = ComponentHostDBus(self.bus, Host.BUS_OBJECT_PATH, self)
 		
 		try:
 			self.glade_prefix = os.environ["GLADE_PREFIX"]
@@ -63,7 +63,7 @@ class TabbedHost(object):
 		# Check for any clients that can't just be closed.
 		for client in self.clients:
 			d = client.GetSaveStatus()
-			if d != Components.Client.SAVE_STATUS_SAVED:
+			if d != Client.SAVE_STATUS_SAVED:
 				clients_denying_close.append(client)
 				deny_close = True
 		
@@ -94,7 +94,7 @@ class TabbedHost(object):
 		self.add_pid(int(self.entry.get_text()))
 	
 	def add_pid(self,pid):
-		client = Client(self.bus,pid,self)
+		client = HostClient(self.bus,pid,self)
 		self.clients.append(client)
 		
 		hbox = gtk.HBox(spacing=5)

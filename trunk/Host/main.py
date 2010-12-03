@@ -10,7 +10,6 @@ app = None
 def main():
 	global app
 	
-	
 	# Arguments
 	parser = argparse.ArgumentParser(description='A multi-process tab server.')
 	parser.add_argument('-a','--add',type=int,default=0,help="the PID that this host will add immediately")
