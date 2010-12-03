@@ -11,10 +11,6 @@ import Components.Host
 
 gobject.threads_init ()
 
-prefix_glade_host = "/home/dan/Desktop/Programming/ude/ude-components/Host/"
-path_python = "/usr/bin/python2"
-path_host_script = "/home/dan/Desktop/Programming/ude/ude-components/Host/main.py"
-
 class Base(object):
 	bus = None
 	bus_name = None
@@ -40,9 +36,9 @@ class Base(object):
 		if hostPID == 0:
 			#fd = os.open(os.devnull, os.O_RDWR)
 			env = os.environ.copy()
-			env["GLADE_PREFIX"] = prefix_glade_host
+			env["GLADE_PREFIX"] = Components.Host.GLADE_PREFIX
 			#subprocess.Popen(['setsid',path_python,path_host_script,"-a",str(os.getpid())],env=env,stdout=fd,stderr=fd)
-			subprocess.Popen(['setsid',path_python,path_host_script,"-a",str(os.getpid())],env=env)
+			subprocess.Popen(['setsid',Components.PYTHON2_PATH,Components.Host.MAIN_TABBED,"-a",str(os.getpid())],env=env)
 		else:
 			print "connect to host"
 			
