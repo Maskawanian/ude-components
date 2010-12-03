@@ -8,31 +8,6 @@ from HostClient import Client
 from UnsavedChangesHandler import UnsavedChangesHandler
 import Components.Client
 
-app = None
-bus = None
-arg_add = None
-
-def main():
-	global app
-	global bus
-	global arg_add
-	
-	# Arguments
-	parser = argparse.ArgumentParser(description='A multi-process tab server.')
-	parser.add_argument('-a','--add',type=int,default=0,help="the PID that this host will add immediately")
-	args = parser.parse_args()
-	arg_add = args.add
-	print arg_add
-	
-	 
-	
-	print "Host PID",os.getpid()
-	
-	
-	app = Host()
-	gtk.main()
-	pass
-
 class Host(object):
 	bus = None
 	bus_name = None
@@ -52,7 +27,7 @@ class Host(object):
 	
 	clients = []
 	
-	def __init__(self):
+	def __init__(self,add_pid):
 		super(Host, self).__init__()
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		
@@ -75,8 +50,8 @@ class Host(object):
 		self.window.connect("delete-event",self.do_window_delete_event)
 		self.window.show_all()
 		
-		if arg_add != 0:
-			self.add_pid(arg_add)
+		if add_pid != 0:
+			self.add_pid(add_pid)
 		pass
 	
 	__uch = None
@@ -149,6 +124,4 @@ class ComponentHostDBus(dbus.service.Object):
 	@dbus.service.method(dbus_interface='org.ude.components.host',in_signature='i')
 	def RemovePID(self, pid):
 		realobj.remove_pid(pid)
-	
-if __name__ == "__main__":
-	main()
+
