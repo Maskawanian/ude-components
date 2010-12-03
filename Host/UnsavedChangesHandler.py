@@ -71,25 +71,45 @@ class UnsavedChangesHandler(object):
 		self.window.show_all()
 		pass
 	
-	def __cb_save_specific_client(self,sender,client):
-		print "__cb_save_specific_client",client
+	def save_specific_client(self,client):
+		print "save_specific_client",client
 		pass
+	
+	def dont_save_specific_client(self,client):
+		print "dont_save_specific_client",client
+		pass
+	
+	def save_all(self):
+		print "save_all"
+		pass
+	
+	def dont_save_all(self):
+		print "dont_save_all"
+		pass
+	
+	def cancel(self):
+		print "cancel"
+		self.window.hide()
+		pass
+	
+	def __cb_save_specific_client(self,sender,client):
+		self.save_specific_client(client)
 		
 	def __cb_dont_save_specific_client(self,sender,client):
-		print "__cb_dont_save_specific_client",client
-		pass
-	
-	def __cb_dont_save_all(self,sender):
-		print "__cb_dont_save_all"
+		self.dont_save_specific_client(client)
 	
 	def __cb_save_all(self,sender):
-		print "__cb_save_all"
+		self.save_all()
+	
+	def __cb_dont_save_all(self,sender):
+		self.dont_save_all()
 	
 	def __cb_cancel(self,sender):
-		print "__cb_cancel"
+		self.cancel()
 	
-	
-	
+	def __cb_window_delete_event(self,sender,event):
+		self.cancel()
+		return True # Stop Delete
 	
 	
 	
