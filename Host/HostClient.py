@@ -5,6 +5,7 @@ import sys,os
 import gobject,pygtk,gtk,gio
 gobject.threads_init ()
 import dbus,dbus.service,dbus.mainloop.glib
+import Components
 from Components import Client
 
 class HostClient(object):
@@ -57,7 +58,7 @@ class HostClient(object):
 		
 		img = gtk.Image()
 		img.set_size_request(12,12)
-		img.set_from_file("/usr/share/ude/components/12x12close.svg")
+		img.set_from_file(Components.MEDIA_PATH_PREFIX+"12x12close.svg")
 		self.closebutton = gtk.ToolButton(img)
 		
 		self.socket = gtk.Socket()
@@ -143,7 +144,7 @@ class HostClient(object):
 			try:
 				pb = gtk.gdk.pixbuf_new_from_file_at_size(self.proxy_icon_path,16,16)
 			except:
-				pb = gtk.gdk.pixbuf_new_from_file_at_size("/usr/share/ude/components/16x16doc.svg",16,16)
+				pb = gtk.gdk.pixbuf_new_from_file_at_size(Components.MEDIA_PATH_PREFIX+"16x16doc.svg",16,16)
 			self.image.set_from_pixbuf(pb)
 		pass
 	

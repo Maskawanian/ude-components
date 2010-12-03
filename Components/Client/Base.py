@@ -20,7 +20,7 @@ class Base(object):
 	plug = None   
 	
 	__title = "untitled {0}".format(os.getpid())
-	__proxy_icon_path = "/usr/share/ude/components/16x16doc.svg"
+	__proxy_icon_path = Components.MEDIA_PATH_PREFIX+"16x16doc.svg"
 	__save_status = 0 # We can't use Components.Client.SAVE_STATUS_SAVED for some reason.
 	
 	def __init__(self,hostPID):
