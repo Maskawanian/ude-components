@@ -12,6 +12,7 @@ class Client:
 	
 	bus = None
 	remote = None
+	delegate = None
 	
 	builder = None
 	widget = None
@@ -26,7 +27,9 @@ class Client:
 	title = None
 	proxy_icon_path = None
 	
-	def __init__(self,bus,pid):
+	def __init__(self,bus,pid,delegate):
+		self.delegate = delegate
+		
 		try:
 			self.glade_prefix = os.environ["GLADE_PREFIX"]
 		except KeyError:
@@ -34,8 +37,9 @@ class Client:
 		
 		self.bus = bus
 		self.remote = self.bus.get_object("org.ude.components.client_"+str(pid),"/org/ude/components/client")
-		self.remote.connect_to_signal("TitleChanged",self.__TitleChanged_cb)
-		self.remote.connect_to_signal("ProxyIconChanged",self.__ProxyIconChanged_cb)
+		self.remote.connect_to_signal("TitleChanged",self.__cb_title_changed)
+		self.remote.connect_to_signal("ProxyIconChanged",self.__cb_proxy_icon_changed)
+		self.remote.connect_to_signal("SaveStatusChanged",self.__cb_save_status_changed)
 		
 		self.builder = gtk.Builder()
 		self.builder.add_from_file(self.glade_prefix+"HostClient.glade")
@@ -112,17 +116,17 @@ class Client:
 		except:
 			return ""
 	
-	def __TitleChanged_cb(self,title):
-		self.title = title
-		self.label.set_text(self.title)
-	
 	def GetProxyIconPath(self):
 		try:
 			return self.remote.GetProxyIconPath(dbus_interface="org.ude.components.client")
 		except:
 			return ""
 	
-	def __ProxyIconChanged_cb(self,path):
+	def __cb_title_changed(self,title):
+		self.title = title
+		self.label.set_text(self.title)
+	
+	def __cb_proxy_icon_changed(self,path):
 		self.proxy_icon_path = path
 		if self.proxy_icon_path.endswith((".gif",".apng",".mng")):
 			anim = gtk.gdk.PixbufAnimation(self.proxy_icon_path)
@@ -135,7 +139,10 @@ class Client:
 				pb = gtk.gdk.pixbuf_new_from_file_at_size("/usr/share/ude/components/16x16doc.svg",16,16)
 			self.image.set_from_pixbuf(pb)
 		pass
-
+	
+	def __cb_save_status_changed(self,status):
+		self.delegate.update_save_status(self,status)
+		pass
 
 
 

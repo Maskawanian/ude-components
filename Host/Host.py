@@ -86,7 +86,7 @@ class Host(object):
 				clients_denying_close.append(client)
 				deny_close = True
 		
-		self.__uch = UnsavedChangesHandler(clients_denying_close)
+		self.__uch = UnsavedChangesHandler(clients_denying_close,self)
 		self.__uch.show(self.window)
 		
 		print "deny_close",deny_close
@@ -100,11 +100,20 @@ class Host(object):
 		gtk.main_quit()
 		return False
 	
+	def update_unsaved_changes_handler(self,resolution):
+		print "unsaved_changes_handler",resolution
+		self.__uch = None
+		pass
+	
+	def update_save_status(self,client,status):
+		if self.__uch:
+			self.__uch.update_save_status(client,status)
+	
 	def do_add_pid_clicked(self,sender):
 		self.add_pid(int(self.entry.get_text()))
 	
 	def add_pid(self,pid):
-		client = Client(bus,pid)
+		client = Client(bus,pid,self)
 		self.clients.append(client)
 		
 		hbox = gtk.HBox(spacing=5)

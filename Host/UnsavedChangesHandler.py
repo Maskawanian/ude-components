@@ -13,7 +13,9 @@ class UnsavedChangesHandler(object):
 	button_cancel = None
 	button_dont_save = None
 	
-	def __init__(self,clients_denying_close):
+	delegate = None
+	
+	def __init__(self,clients_denying_close,delegate):
 		super(UnsavedChangesHandler, self).__init__()
 		try:
 			self.glade_prefix = os.environ["GLADE_PREFIX"]
@@ -29,6 +31,7 @@ class UnsavedChangesHandler(object):
 		self.vbox = self.builder.get_object("vbox") 
 		
 		self.clients_denying_close = clients_denying_close
+		self.delegate = delegate
 		
 		self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
 		self.window.set_deletable(False)
@@ -37,6 +40,8 @@ class UnsavedChangesHandler(object):
 		#self.window.set_decorated(False)
 		
 		for client in self.clients_denying_close:
+			
+			
 			# We need to make a manual save row for the client.
 			client.__unsaved_hbox = gtk.HBox(spacing=10)
 			client.__unsaved_image = gtk.image_new_from_stock("gtk-save",gtk.ICON_SIZE_BUTTON)
@@ -88,9 +93,8 @@ class UnsavedChangesHandler(object):
 		pass
 	
 	def cancel(self):
-		print "cancel"
 		self.window.hide()
-		pass
+		self.delegate.update_unsaved_changes_handler(0)
 	
 	def __cb_save_specific_client(self,sender,client):
 		self.save_specific_client(client)
@@ -111,7 +115,9 @@ class UnsavedChangesHandler(object):
 		self.cancel()
 		return True # Stop Delete
 	
-	
+	def update_save_status(self,client,status):
+		print "update_save_status",client,status
+		pass
 	
 	
 	
