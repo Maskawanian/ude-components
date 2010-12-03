@@ -6,9 +6,10 @@ import gobject,pygtk,gtk,gio
 import dbus,dbus.service,dbus.mainloop.glib
 from HostClient import Client
 from UnsavedChangesHandler import UnsavedChangesHandler
+from ComponentHostDBus import ComponentHostDBus
 import Components.Client
 
-class Host(object):
+class TabbedHost(object):
 	bus = None
 	bus_name = None
 	bus_service_name = None
@@ -28,7 +29,7 @@ class Host(object):
 	clients = []
 	
 	def __init__(self,add_pid):
-		super(Host, self).__init__()
+		super(TabbedHost, self).__init__()
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		
 		self.bus = dbus.SessionBus()
@@ -42,7 +43,7 @@ class Host(object):
 			print "No Glade Environment"
 		
 		self.builder = gtk.Builder()
-		self.builder.add_from_file(self.glade_prefix+"Host.glade")
+		self.builder.add_from_file(self.glade_prefix+"TabbedHost.glade")
 		
 		self.window = self.builder.get_object("window")
 		self.notebook = self.builder.get_object("notebook")
@@ -110,18 +111,5 @@ class Host(object):
 			del client
 
 	
-class ComponentHostDBus(dbus.service.Object):
-	realobj = None
-	
-	def __init__(self, bus, object_path, realobj):
-		dbus.service.Object.__init__(self, bus, object_path)
-		self.realobj = realobj
-	
-	@dbus.service.method(dbus_interface='org.ude.components.host',in_signature='i')
-	def AddPID(self, pid):
-		realobj.add_pid(pid)
-	
-	@dbus.service.method(dbus_interface='org.ude.components.host',in_signature='i')
-	def RemovePID(self, pid):
-		realobj.remove_pid(pid)
+
 
