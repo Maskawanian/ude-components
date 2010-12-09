@@ -1,7 +1,7 @@
 # See LICENCE for the source code licence.
 # (c) 2010 Dan Saul
 
-import sys,os,argparse
+import sys,os,argparse,time
 import gobject,pygtk,gtk,gio
 import dbus,dbus.service,dbus.mainloop.glib
 import subprocess,threading
@@ -25,8 +25,6 @@ class Base(object):
 	
 	def __init__(self,hostPID):
 		super(Base, self).__init__()
-		
-		
 		
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		self.bus = dbus.SessionBus()
@@ -81,6 +79,12 @@ class Base(object):
 		
 		return self.plug.get_id()
 	
+	def save(self):
+		self.set_save_status(3) # Saving
+		time.sleep(1)
+		self.set_save_status(0) # Saved
+		pass
+	
 	def prepare_new_widget(self):
 		ret = gtk.Button("Default Widget")
 		return ret
@@ -128,6 +132,10 @@ class ComponentClientDBus(dbus.service.Object):
 	@dbus.service.method(dbus_interface='org.ude.components.client', out_signature='i')
 	def Prepare(self):
 		return self.realobj.prepare()
+	
+	@dbus.service.method(dbus_interface='org.ude.components.client')
+	def Save(self):
+		self.realobj.save()
 	
 	@dbus.service.method(dbus_interface='org.ude.components.client')
 	def NotifyClosedByHost(self):

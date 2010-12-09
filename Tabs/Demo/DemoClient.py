@@ -17,4 +17,5 @@ class DemoClient(Client.Base):
 	def button_press(self,sender):
 		print "click"
 		self.set_save_status(Client.SAVE_STATUS_SAVED)
+		#raise Exception("test")
 		pass
