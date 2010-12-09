@@ -96,6 +96,18 @@ class HostClient(object):
 		except:
 			return None
 	
+	def Save(self):
+		try:
+			self.remote.Save(dbus_interface=Client.BUS_INTERFACE_NAME,
+							 reply_handler=self.__cb_save_stub,
+							 error_handler=self.__cb_save_stub_e)
+		except:
+			pass
+	def __cb_save_stub(self):
+		pass
+	def __cb_save_stub_e(self):
+		pass
+	
 	def GetSaveStatus(self):
 		try:
 			return self.remote.GetSaveStatus(dbus_interface=Client.BUS_INTERFACE_NAME)
