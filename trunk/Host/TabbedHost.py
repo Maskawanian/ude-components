@@ -95,6 +95,13 @@ class TabbedHost(object):
 	def unsaved_changes_handler_return(self,resolution):
 		print "unsaved_changes_handler_return",resolution
 		self.__uch = None
+		
+		if resolution == UnsavedChangesHandler.RETURN_SAVED_ALL:
+			# Tell all the clients to quit.
+			for client in self.clients:
+				client.NotifyClosedByHost()
+			
+			gtk.main_quit()
 		pass
 	
 	def update_save_status(self,client,status):

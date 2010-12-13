@@ -89,12 +89,7 @@ class UnsavedChangesHandler(object):
 			client.__unsaved_hbox.show()
 			client.__unsaved_label.show()
 			
-			
 			self.__update_status_visibility(client)
-				
-			
-			
-			#status == Client.SAVE_STATUS_SAVED
 			
 		self.button_save_all.connect("clicked",self.__cb_save_all)
 		self.button_cancel.connect("clicked",self.__cb_cancel)
@@ -168,7 +163,7 @@ class UnsavedChangesHandler(object):
 	
 	def cancel(self):
 		self.window.hide()
-		self.delegate.unsaved_changes_handler_return(0)
+		self.delegate.unsaved_changes_handler_return(UnsavedChangesHandler.RETURN_CANCEL)
 	
 	def __cb_save_specific_client(self,sender,client):
 		self.save_specific_client(client)
@@ -190,11 +185,19 @@ class UnsavedChangesHandler(object):
 		return True # Stop Delete
 	
 	def update_save_status(self,client,status):
-		print "update_save_status",client,status
 		self.__update_status_visibility(client,status)
+		if status == Client.SAVE_STATUS_SAVED:
+			self.clients_denying_close.remove(client)
+		
+		print "update_save_status",client,status
+		if len(self.clients_denying_close) == 0:
+			self.window.hide()
+			self.delegate.unsaved_changes_handler_return(UnsavedChangesHandler.RETURN_SAVED_ALL)
+		
 		pass
 	
-#UnsavedChangesHandler.
+UnsavedChangesHandler.RETURN_CANCEL = 0
+UnsavedChangesHandler.RETURN_SAVED_ALL = 1
 	
 	
 	
