@@ -4,7 +4,7 @@ import urllib,urlparse
 import sexy
 import webkit
 
-import Components.Client
+from Components import Client
 from WebViewTab import WebViewTab
 from AdBlock import AdBlock
 
@@ -15,7 +15,7 @@ webkit.LOAD_FINISHED = 2
 webkit.LOAD_FIRST_VISUALLY_NON_EMPTY_LAYOUT = 3
 webkit.LOAD_FAILED = 4
 
-class WebClient(Components.Client.Base):
+class WebClient(Client.Base):
 	
 	tlds = ["aero","asia","biz","cat","com","coop",\
 		"edu","gov","info","int","jobs","mil","mobi",\
@@ -87,7 +87,7 @@ class WebClient(Components.Client.Base):
 		self.__adblock = AdBlock()
 		self.__adblock.add_file('/home/dan/Desktop/Programming/ude/ude-components/Tabs/Web/easylist.txt')
 		
-		
+		self.set_save_status(Client.SAVE_STATUS_UNSAVABLE)
 		
 		pass
 	
@@ -185,8 +185,15 @@ class WebClient(Components.Client.Base):
 	def __tb_stop_clicked(self,sender):
 		self.__wv.stop_loading()
 	
+	__desc_last_uri = ""
+	__desc_last_title = ""
+	
 	def __wv_notify_uri(self,sender,arg):
-		self.__tb_address_entry.set_text(self.__wv.get_main_frame().get_uri())
+		uri = self.__wv.get_main_frame().get_uri()
+		self.__tb_address_entry.set_text(uri)
+		if uri != None:
+			self.__desc_last_uri = uri
+		self.set_description("<b>"+self.__desc_last_title+"</b>\n"+self.__desc_last_uri)
 	
 	def __wv_notify_progress(self,sender,arg):
 		print "progress",self.__wv.get_property("progress")
@@ -227,6 +234,11 @@ class WebClient(Components.Client.Base):
 	def __wv_notify_title(self,sender,arg):
 		title = self.__wv.get_property("title")
 		self.set_title(title)
+		
+		if title != None:
+			self.__desc_last_title = title
+		
+		self.set_description("<b>"+self.__desc_last_title+"</b>\n"+self.__desc_last_uri)
 	
 	def __wv_notify_icon_uri(self,sender,arg):
 		uri = self.__wv.get_property("icon-uri")

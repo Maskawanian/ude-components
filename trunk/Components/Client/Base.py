@@ -20,16 +20,22 @@ class Base(object):
 	plug = None   
 	
 	__title = "untitled {0}".format(os.getpid())
+	__description = "PID {0}".format(os.getpid())
 	__proxy_icon_path = Components.MEDIA_PATH_PREFIX+"16x16doc.svg"
 	__save_status = 0 # We can't use Components.Client.SAVE_STATUS_SAVED for some reason.
 	
 	def __init__(self,hostPID):
 		super(Base, self).__init__()
+		assert hostPID >= 0
 		
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		self.bus = dbus.SessionBus()
 		self.bus_name = dbus.service.BusName(Components.Client.BUS_INTERFACE_NAME+"_"+str(os.getpid()), self.bus)
 		self.bus_obj = ComponentClientDBus(self.bus,Components.Client.BUS_OBJECT_PATH,self)
+		
+		assert self.bus != None
+		assert self.bus_name != None
+		assert self.bus_obj != None
 		
 		if hostPID == 0:
 			#fd = os.open(os.devnull, os.O_RDWR)
@@ -45,6 +51,7 @@ class Base(object):
 				raise Exception("The bus `"+host_bus_name+"` does not exist.")
 			
 			remotehost = self.bus.get_object(host_bus_name,Components.Host.BUS_OBJECT_PATH)
+			assert remotehost != None
 			remotehost.AddPID(os.getpid(),dbus_interface=Components.Host.BUS_INTERFACE_NAME,reply_handler=self.__cb_add_pid,error_handler=self.__cb_add_pid_e)
 		pass
 	
@@ -103,22 +110,28 @@ class Base(object):
 		self.bus_obj.SaveStatusChanged(self.__save_status)
 	
 	def get_description(self):
-		return "PID {0}".format(os.getpid())
-
+		return self.__description
+		
+	def set_description(self,description):
+		if description == None:
+			description = ""
+		self.__description = str(description)
+		self.bus_obj.DescriptionChanged(self.__description)
 	
 	def get_title(self):
 		return self.__title
 	
 	def set_title(self,title):
 		if None != title:
-			self.__title = title
+			self.__title = str(title)
 			self.bus_obj.TitleChanged(self.__title)
 	
 	def get_proxy_icon_path(self):
 		return self.__proxy_icon_path
 	
 	def set_proxy_icon_path(self,path):
-		self.__proxy_icon_path = path
+		assert path != None
+		self.__proxy_icon_path = str(path)
 		self.bus_obj.ProxyIconChanged(self.__proxy_icon_path)
 		
 	
@@ -159,6 +172,10 @@ class ComponentClientDBus(dbus.service.Object):
 	
 	@dbus.service.signal(dbus_interface='org.ude.components.client', signature='s')
 	def TitleChanged(self, title):
+		pass
+		
+	@dbus.service.signal(dbus_interface='org.ude.components.client', signature='s')
+	def DescriptionChanged(self, description):
 		pass
 	
 	@dbus.service.signal(dbus_interface='org.ude.components.client', signature='s')

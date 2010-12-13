@@ -30,12 +30,18 @@ class TabbedHost(object):
 	
 	def __init__(self,add_pid):
 		super(TabbedHost, self).__init__()
-		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+		assert add_pid >= 0
 		
+		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		self.bus = dbus.SessionBus()
 		self.bus_name = Host.BUS_INTERFACE_NAME+"_"+str(os.getpid())
 		self.bus_service_name = dbus.service.BusName(self.bus_name, self.bus)
 		self.bus_obj = ComponentHostDBus(self.bus, Host.BUS_OBJECT_PATH, self)
+		
+		assert self.bus != None
+		assert self.bus_name != None
+		assert self.bus_service_name != None
+		assert self.bus_obj != None
 		
 		try:
 			self.glade_prefix = os.environ["GLADE_PREFIX"]
@@ -43,10 +49,15 @@ class TabbedHost(object):
 			print "No Glade Environment"
 		
 		self.builder = gtk.Builder()
-		self.builder.add_from_file(self.glade_prefix+"TabbedHost.glade")
+		path = self.glade_prefix+"TabbedHost.glade"
+		assert os.path.exists(path)
+		self.builder.add_from_file(path)
 		
 		self.window = self.builder.get_object("window")
 		self.notebook = self.builder.get_object("notebook")
+		
+		assert self.window != None
+		assert self.notebook != None
 		
 		self.window.connect("delete-event",self.do_window_delete_event)
 		self.window.show_all()
@@ -81,8 +92,8 @@ class TabbedHost(object):
 		gtk.main_quit()
 		return False
 	
-	def update_unsaved_changes_handler(self,resolution):
-		print "unsaved_changes_handler",resolution
+	def unsaved_changes_handler_return(self,resolution):
+		print "unsaved_changes_handler_return",resolution
 		self.__uch = None
 		pass
 	

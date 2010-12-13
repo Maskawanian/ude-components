@@ -13,8 +13,8 @@ class ComponentHostDBus(dbus.service.Object):
 	
 	@dbus.service.method(dbus_interface='org.ude.components.host',in_signature='i')
 	def AddPID(self, pid):
-		realobj.add_pid(pid)
+		self.realobj.add_pid(pid)
 	
 	@dbus.service.method(dbus_interface='org.ude.components.host',in_signature='i')
 	def RemovePID(self, pid):
-		realobj.remove_pid(pid)
+		self.realobj.remove_pid(pid)
