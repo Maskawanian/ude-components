@@ -36,7 +36,7 @@ class UnsavedChangesHandler(object):
 		
 		self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
 		self.window.set_deletable(False)
-		self.window.set_resizable(False)
+		#self.window.set_resizable(False)
 		self.window.set_title("Save Changes?")
 		#self.window.set_decorated(False)
 		
@@ -52,6 +52,8 @@ class UnsavedChangesHandler(object):
 			client.__unsaved_image_save.set_size_request(22,22)
 			client.__unsaved_image_saved = gtk.image_new_from_stock(gtk.STOCK_APPLY,gtk.ICON_SIZE_BUTTON)
 			client.__unsaved_image_saved.set_size_request(22,22)
+			client.__unsaved_image_no_save = gtk.image_new_from_stock(gtk.STOCK_DIALOG_WARNING,gtk.ICON_SIZE_BUTTON)
+			client.__unsaved_image_no_save.set_size_request(22,22)
 			client.__unsaved_label = gtk.Label("NO LABEL SET")
 			client.__unsaved_label.set_justify(gtk.JUSTIFY_LEFT)
 			client.__unsaved_label.set_alignment(0,0.5)
@@ -67,12 +69,13 @@ class UnsavedChangesHandler(object):
 			client.__unsaved_button_save_as = gtk.Button("Save As...")
 			#client.__unsaved_button_save.connect("clicked",self.__cb_save_specific_client,client)
 			client.__unsaved_button_save_as.set_size_request(100,-1)
-			client.__unsaved_button_cant_save = gtk.Button("Unable to Save")
+			client.__unsaved_button_cant_save = gtk.Button("Not Savable")
 			client.__unsaved_button_cant_save.set_size_request(210,-1)
 			client.__unsaved_button_cant_save.set_sensitive(False)
 			client.__unsaved_hbox.pack_start(client.__unsaved_spinner,expand=False)
 			client.__unsaved_hbox.pack_start(client.__unsaved_image_save,expand=False)
 			client.__unsaved_hbox.pack_start(client.__unsaved_image_saved,expand=False)
+			client.__unsaved_hbox.pack_start(client.__unsaved_image_no_save,expand=False)
 			client.__unsaved_hbox.pack_start(client.__unsaved_label)
 			client.__unsaved_hbox.pack_start(client.__unsaved_button_dontsave,expand=False)
 			client.__unsaved_hbox.pack_start(client.__unsaved_button_save,expand=False)
@@ -104,31 +107,42 @@ class UnsavedChangesHandler(object):
 		if status == Client.SAVE_STATUS_NOT_SAVED_NEED_PATH:
 			client.__unsaved_image_save.show()
 			client.__unsaved_spinner.hide()
+			client.__unsaved_image_no_save.hide()
 			client.__unsaved_button_dontsave.show()
 			client.__unsaved_button_dontsave.set_sensitive(True)
 			client.__unsaved_button_save_as.show()
 			client.__unsaved_button_save_as.set_sensitive(True)
+			client.__unsaved_button_cant_save.hide()
 		elif status == Client.SAVE_STATUS_NOT_SAVED:
 			client.__unsaved_image_save.show()
 			client.__unsaved_spinner.hide()
+			client.__unsaved_image_no_save.hide()
 			client.__unsaved_button_dontsave.show()
 			client.__unsaved_button_dontsave.set_sensitive(True)
 			client.__unsaved_button_save.show()
 			client.__unsaved_button_save.set_sensitive(True)
+			client.__unsaved_button_cant_save.hide()
 		elif status == Client.SAVE_STATUS_SAVING:
 			client.__unsaved_spinner.show()
+			client.__unsaved_image_no_save.hide()
 			client.__unsaved_image_save.hide()
 			client.__unsaved_button_dontsave.hide()
 			client.__unsaved_button_save.hide()
 			client.__unsaved_button_dontsave.set_sensitive(False)
 			client.__unsaved_button_save.set_sensitive(False)
 			client.__unsaved_button_save_as.set_sensitive(False)
+			client.__unsaved_button_cant_save.hide()
 		elif status == Client.SAVE_STATUS_SAVED:
 			client.__unsaved_image_saved.show()
 			client.__unsaved_spinner.hide()
+			client.__unsaved_image_no_save.hide()
 			client.__unsaved_image_save.hide()
 			client.__unsaved_button_dontsave.hide()
 			client.__unsaved_button_save.hide()
+			client.__unsaved_button_cant_save.hide()
+		elif status == Client.SAVE_STATUS_UNSAVABLE:
+			client.__unsaved_image_no_save.show()
+			client.__unsaved_button_cant_save.show()
 	
 	def show(self,parent):
 		self.window.set_modal(True)
@@ -154,7 +168,7 @@ class UnsavedChangesHandler(object):
 	
 	def cancel(self):
 		self.window.hide()
-		self.delegate.update_unsaved_changes_handler(0)
+		self.delegate.unsaved_changes_handler_return(0)
 	
 	def __cb_save_specific_client(self,sender,client):
 		self.save_specific_client(client)
@@ -180,7 +194,7 @@ class UnsavedChangesHandler(object):
 		self.__update_status_visibility(client,status)
 		pass
 	
-	
+#UnsavedChangesHandler.
 	
 	
 	

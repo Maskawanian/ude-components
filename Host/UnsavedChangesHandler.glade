@@ -85,7 +85,7 @@ If you do not save, your changes will be lost!</property>
             <child>
               <object class="GtkButton" id="buttonDontSave">
                 <property name="label" translatable="yes">Don't Save</property>
-                <property name="width_request">100</property>
+                <property name="width_request">105</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -99,7 +99,7 @@ If you do not save, your changes will be lost!</property>
             <child>
               <object class="GtkButton" id="buttonCancel">
                 <property name="label" translatable="yes">Cancel</property>
-                <property name="width_request">100</property>
+                <property name="width_request">105</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -114,7 +114,7 @@ If you do not save, your changes will be lost!</property>
             <child>
               <object class="GtkButton" id="buttonSaveAll">
                 <property name="label" translatable="yes">Save All</property>
-                <property name="width_request">100</property>
+                <property name="width_request">105</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="has_focus">True</property>
