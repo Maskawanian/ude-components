@@ -84,7 +84,8 @@ class UnsavedChangesHandler(object):
 			self.vbox.pack_start(client.__unsaved_hbox,expand=False)
 			
 			description = client.GetDescription()
-			client.__unsaved_label.set_markup(description)
+			print "!!!!!!!!!!!!!!!description",description
+			client.__unsaved_label.set_markup(description.replace("&","&amp;"))
 			
 			client.__unsaved_hbox.show()
 			client.__unsaved_label.show()
@@ -143,13 +144,29 @@ class UnsavedChangesHandler(object):
 		self.window.set_modal(True)
 		self.window.set_transient_for(parent)
 		self.window.show()
+		
+		# Remove unsavable items from self.clients_denying_close 
+		# so they don't deny close. This has to be done after 
+		# showing so that they are visable in the list none the less.
+		new_arr = []
+		for client in self.clients_denying_close:
+			status = client.GetSaveStatus()
+			if status != Client.SAVE_STATUS_UNSAVABLE:
+				new_arr.append(client)
+		
+		self.clients_denying_close = new_arr
 		pass
 	
 	def save_specific_client(self,client):
 		client.Save()
 	
 	def dont_save_specific_client(self,client):
+		if client in self.clients_denying_close:
+			self.clients_denying_close.remove(client)
 		
+		if len(self.clients_denying_close) == 0:
+			self.window.hide()
+			self.delegate.unsaved_changes_handler_return(UnsavedChangesHandler.RETURN_SAVED_ALL)
 		print "dont_save_specific_client",client
 		pass
 	
