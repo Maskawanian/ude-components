@@ -164,19 +164,21 @@ class UnsavedChangesHandler(object):
 		if client in self.clients_denying_close:
 			self.clients_denying_close.remove(client)
 		
+		# Disable the buttons.
+		client.__unsaved_button_dontsave.set_sensitive(False)
+		client.__unsaved_button_save.set_sensitive(False)
+		
 		if len(self.clients_denying_close) == 0:
 			self.window.hide()
 			self.delegate.unsaved_changes_handler_return(UnsavedChangesHandler.RETURN_SAVED_ALL)
-		print "dont_save_specific_client",client
-		pass
 	
 	def save_all(self):
-		print "save_all"
-		pass
+		for client in self.clients_denying_close:
+			client.Save()
 	
 	def dont_save_all(self):
-		print "dont_save_all"
-		pass
+		self.window.hide()
+		self.delegate.unsaved_changes_handler_return(UnsavedChangesHandler.RETURN_SAVED_ALL)
 	
 	def cancel(self):
 		self.window.hide()
