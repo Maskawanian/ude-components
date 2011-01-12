@@ -164,9 +164,7 @@ class UnsavedChangesHandler(object):
 		if client in self.clients_denying_close:
 			self.clients_denying_close.remove(client)
 		
-		# Disable the buttons.
 		client.__unsaved_button_dontsave.set_sensitive(False)
-		client.__unsaved_button_save.set_sensitive(False)
 		
 		if len(self.clients_denying_close) == 0:
 			self.window.hide()
