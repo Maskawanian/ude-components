@@ -13,8 +13,6 @@ from logging import debug,info,warning,error,critical,log,exception
 l = Host.logger
 
 class HostClient(object):
-	glade_prefix = ""
-	
 	bus = None
 	remote = None
 	delegate = None
@@ -33,17 +31,22 @@ class HostClient(object):
 	proxy_icon_path = None
 	
 	def __init__(self,bus,pid,delegate):
-		super(HostClient, self).__init__()
-		self.delegate = delegate
+		assert None != bus
+		assert None != delegate
+		assert 0 < pid
 		
+		super(HostClient, self).__init__()
+		
+		self.delegate = delegate
 		self.bus = bus
+		
 		self.remote = self.bus.get_object(Client.BUS_INTERFACE_NAME_PID_FORMAT.format(pid),Client.BUS_OBJECT_PATH)
 		self.remote.connect_to_signal("TitleChanged",self.__cb_title_changed)
 		self.remote.connect_to_signal("ProxyIconChanged",self.__cb_proxy_icon_changed)
 		self.remote.connect_to_signal("SaveStatusChanged",self.__cb_save_status_changed)
 		
 		self.builder = gtk.Builder()
-		self.builder.add_from_file(Host.glade_prefix+"HostClient.glade")
+		self.builder.add_from_file(Host.GLADE_PREFIX+"HostClient.glade")
 		
 		self.widget = gtk.VBox()
 		self.widget.add_events(gtk.gdk.STRUCTURE_MASK)
