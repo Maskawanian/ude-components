@@ -90,7 +90,7 @@ class TabbedHost(object):
 		gtk.main_quit()
 		return False
 	
-	def unsaved_changes_handler_return(self,resolution):
+	def unsaved_changes_handler_cb(self,resolution):
 		l.info("unsaved_changes_handler_return {0}".format(resolution))
 		self.__uch = None
 		
