@@ -158,8 +158,6 @@ class TabbedHost(object):
 		assert None != self.clients
 		assert None != self.notebook
 		
-		assert None != 
-		
 		for client in self.clients:
 			w = client.widget
 			assert None != w
