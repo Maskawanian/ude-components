@@ -25,13 +25,13 @@ __fh.setLevel(logging.DEBUG)
 __ch = logging.StreamHandler()
 __ch.setLevel(logging.ERROR)
 
-__formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+__formatter = logging.Formatter('%(asctime)s %(name)s[%(process)d:%(levelname)s] %(filename)s::%(funcName)s() - %(message)s')
 __fh.setFormatter(__formatter)
 __ch.setFormatter(__formatter)
 
 logger.addHandler(__fh)
 logger.addHandler(__ch)
 
-
+#http://docs.python.org/library/logging.html#http-handler eventually...
 
 
