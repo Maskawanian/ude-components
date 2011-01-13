@@ -25,7 +25,7 @@ def main():
 	
 	client = WebClient(args.host)
 	gtk.main()
-	l.info("Client {0} closing cleanly.".format(os.getpid()))
+	l.critical("Client {0} closing cleanly.".format(os.getpid()))
 	pass
 	
 

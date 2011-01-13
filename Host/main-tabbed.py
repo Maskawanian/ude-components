@@ -26,7 +26,7 @@ def main():
 	
 	app = TabbedHost(arg_add)
 	gtk.main()
-	l.info("Host {0} closing cleanly.".format(os.getpid()))
+	l.critical("Host {0} closing cleanly.".format(os.getpid()))
 	pass
 
 if __name__ == "__main__":
