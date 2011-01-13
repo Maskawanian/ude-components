@@ -1,3 +1,6 @@
+# See LICENCE for the source code licence.
+# (c) 2010 Dan Saul
+
 import sys,os
 import gobject,pygtk,gtk
 

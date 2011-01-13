@@ -1,4 +1,5 @@
-
+# See LICENCE for the source code licence.
+# (c) 2010 Dan Saul
 
 BUS_INTERFACE_NAME = "org.ude.components.host"
 BUS_OBJECT_PATH = "/org/ude/components/host"

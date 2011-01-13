@@ -1,3 +1,6 @@
+# See LICENCE for the source code licence.
+# (c) 2010 Dan Saul
+
 from Base import Base
 
 SAVE_STATUS_SAVED               = 0 # We can close this without losing data.

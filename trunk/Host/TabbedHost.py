@@ -60,7 +60,7 @@ class TabbedHost(object):
 		self.window.connect("delete-event",self.do_window_delete_event)
 		self.window.show_all()
 		
-		if add_pid != 0:
+		if add_pid > 0:
 			self.add_pid(add_pid)
 		pass
 	
