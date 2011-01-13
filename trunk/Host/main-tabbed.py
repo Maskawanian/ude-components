@@ -22,10 +22,11 @@ def main():
 	l.critical("===========================================================")
 	l.critical("Host {0} - A multi-process tab server. Started.".format(os.getpid()))
 	l.critical("===========================================================")
-	l.info("GLADE_PREFIX is {0}".format(Host.glade_prefix))
+	l.info("GLADE_PREFIX is {0}".format(Host.GLADE_PREFIX))
 	
 	app = TabbedHost(arg_add)
 	gtk.main()
+	l.info("Host {0} closing cleanly.".format(os.getpid()))
 	pass
 
 if __name__ == "__main__":

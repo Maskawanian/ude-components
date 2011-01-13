@@ -22,10 +22,10 @@ def main():
 	l.critical("===========================================================")
 	l.critical("Client {0} - A generic client example. Started.".format(os.getpid()))
 	l.critical("===========================================================")
-	l.info("GLADE_PREFIX is {0}".format(Client.glade_prefix))
 	
 	client = DemoClient(args.host)
 	gtk.main()
+	l.info("Client {0} closing cleanly.".format(os.getpid()))
 	pass	
 	
 if __name__ == "__main__":

@@ -18,8 +18,6 @@ class TabbedHost(object):
 	bus_service_name = None
 	bus_obj = None
 	
-	glade_prefix = ""
-	
 	builder = None
 	window = None
 	
@@ -44,7 +42,7 @@ class TabbedHost(object):
 		assert self.bus_obj != None
 		
 		self.builder = gtk.Builder()
-		path = Host.glade_prefix+"TabbedHost.glade"
+		path = Host.GLADE_PREFIX+"TabbedHost.glade"
 		assert os.path.exists(path)
 		self.builder.add_from_file(path)
 		
@@ -89,7 +87,6 @@ class TabbedHost(object):
 			l.info("Notifying {0} to close.".format(client))
 			client.NotifyClosedByHost()
 		
-		l.info("Host {0} closing cleanly.".format(os.getpid()))
 		gtk.main_quit()
 		
 		return False
@@ -108,7 +105,6 @@ class TabbedHost(object):
 		if resolution == UnsavedChangesHandler.RETURN_SAVED_ALL:
 			for client in self.clients:
 				client.NotifyClosedByHost() # Tell the client to quit.
-			l.info("Host {0} closing cleanly.".format(os.getpid()))
 			gtk.main_quit()
 	
 	def update_client_status(self,client,status):

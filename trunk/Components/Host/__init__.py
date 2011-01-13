@@ -24,9 +24,8 @@ __ch.setFormatter(__formatter)
 logger.addHandler(__fh)
 logger.addHandler(__ch)
 
-glade_prefix = GLADE_PREFIX
 try:
-	glade_prefix = os.environ["GLADE_PREFIX"]
+	GLADE_PREFIX = os.environ["GLADE_PREFIX"]
 except KeyError:
 	logger.info("No Glade Environment")
 

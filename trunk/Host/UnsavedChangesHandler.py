@@ -37,7 +37,7 @@ class UnsavedChangesHandler(object):
 		super(UnsavedChangesHandler, self).__init__()
 		
 		self.builder = gtk.Builder()
-		self.builder.add_from_file(Host.glade_prefix+"UnsavedChangesHandler.glade")
+		self.builder.add_from_file(Host.GLADE_PREFIX+"UnsavedChangesHandler.glade")
 		self.window = self.builder.get_object("window")
 		self.button_save_all = self.builder.get_object("buttonSaveAll") 
 		self.button_cancel = self.builder.get_object("buttonCancel") 
