@@ -25,7 +25,7 @@ def main():
 	
 	client = DemoClient(args.host)
 	gtk.main()
-	l.info("Client {0} closing cleanly.".format(os.getpid()))
+	l.critical("Client {0} closing cleanly.".format(os.getpid()))
 	pass	
 	
 if __name__ == "__main__":
