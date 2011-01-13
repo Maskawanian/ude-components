@@ -3,7 +3,8 @@ import gobject,pygtk,gtk
 import urllib,urlparse
 import sexy
 import webkit
-
+import logging
+from logging import debug,info,warning,error,critical,log,exception
 
 from Components import Client
 from WebViewTab import WebViewTab

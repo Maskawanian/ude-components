@@ -1,2 +1,2 @@
 #!/bin/sh
-PYTHONPATH=$PYTHONPATH:../ python2 Host.py "$@"
+PYTHONPATH=$PYTHONPATH:../ python2 main-tabbed.py "$@"
