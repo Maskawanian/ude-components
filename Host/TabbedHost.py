@@ -23,9 +23,6 @@ class TabbedHost(object):
 	builder = None
 	window = None
 	
-	entry = None
-	button = None
-	
 	notebook = None
 	embed = None
 	
@@ -57,7 +54,7 @@ class TabbedHost(object):
 		assert self.window != None
 		assert self.notebook != None
 		
-		self.window.connect("delete-event",self.do_window_delete_event)
+		self.window.connect("delete-event",self.__window_delete_event_cb)
 		self.window.show_all()
 		
 		if add_pid > 0:
@@ -65,52 +62,84 @@ class TabbedHost(object):
 		pass
 	
 	__uch = None
-	def do_window_delete_event(self,sender,event):
-		deny_close = False
-		clients_denying_close = []
+	def __window_delete_event_cb(self,sender,event):
+		"""
+		When the user tries to close the window we may cancel their action and prompt 
+		them if they want to save, or at least inform them when they can't save things.
+		"""
+		assert None == self.__uch
+		assert None != self.clients
+		
+		unsaved_clients = []
 		
 		# Check for any clients that can't just be closed.
 		for client in self.clients:
 			d = client.GetSaveStatus()
 			if d != Client.SAVE_STATUS_SAVED:
-				clients_denying_close.append(client)
-				deny_close = True
+				unsaved_clients.append(client)
 		
-		l.info("deny_close {0}".format(deny_close))
-		
-		if deny_close:
-			self.__uch = UnsavedChangesHandler(clients_denying_close,self)
+		if len(unsaved_clients)>0:
+			l.info("{0} unsaved clients, prompting user if we should save them.".format(len(unsaved_clients)))
+			self.__uch = UnsavedChangesHandler(unsaved_clients,self)
 			self.__uch.show(self.window)
 			return True # Stop Delete
 		
 		# Tell all the clients to quit.
 		for client in self.clients:
+			l.info("Notifying {0} to close.".format(client))
 			client.NotifyClosedByHost()
 		
+		l.info("Host {0} closing cleanly.".format(os.getpid()))
 		gtk.main_quit()
+		
 		return False
 	
 	def unsaved_changes_handler_cb(self,resolution):
-		l.info("unsaved_changes_handler_return {0}".format(resolution))
+		"""
+		Called by UnsavedChangesHandler when it has closed. 
+		We either don't do anything or quit based on that.
+		"""
+		assert None != self.__uch
+		assert None != self.clients
+		assert resolution in UnsavedChangesHandler.RETURN_RANGE
+		
 		self.__uch = None
 		
 		if resolution == UnsavedChangesHandler.RETURN_SAVED_ALL:
-			# Tell all the clients to quit.
 			for client in self.clients:
-				client.NotifyClosedByHost()
-			
+				client.NotifyClosedByHost() # Tell the client to quit.
+			l.info("Host {0} closing cleanly.".format(os.getpid()))
 			gtk.main_quit()
-		pass
 	
 	def update_client_status(self,client,status):
+		"""
+		Called when we get status updates from the clients. This 
+		is just passed to the UnsavedChangesHandler if it exists.
+		"""
+		assert None != client
+		assert status in Client.SAVE_STATUS_RANGE
+		
 		if self.__uch:
 			self.__uch.update_client_status(client,status)
 	
-	def do_add_pid_clicked(self,sender):
-		self.add_pid(int(self.entry.get_text()))
-	
 	def add_pid(self,pid):
+		"""
+		Attempt to add this PID.
+		"""
+		assert 0 < pid
+		assert None != self.bus
+		assert None != self.clients
+		assert None != self.notebook
+		assert self.bus.name_has_owner(Client.BUS_INTERFACE_NAME_PID_FORMAT.format(pid)), "PID provided was not located on DBus."
+		
 		client = HostClient(self.bus,pid,self)
+		
+		assert None != client
+		assert None != client.image
+		assert None != client.label
+		assert None != client.closebutton
+		assert None != client.widget
+		
 		self.clients.append(client)
 		
 		hbox = gtk.HBox(spacing=5)
@@ -122,10 +151,69 @@ class TabbedHost(object):
 		self.notebook.append_page(client.widget,hbox)
 	
 	def remove_pid(self,pid):
+		"""
+		Attempt to remove this PID.
+		"""
+		assert 0 < pid
+		assert None != self.clients
+		assert None != self.notebook
+		
+		assert None != 
+		
 		for client in self.clients:
-			self.notebook.remove_page(self.notebook.page_num(client.widget))
+			w = client.widget
+			assert None != w
+			
+			self.notebook.remove_page(self.notebook.page_num(w))
 			del client
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

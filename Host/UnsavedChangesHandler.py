@@ -15,7 +15,7 @@ class UnsavedChangesHandler(object):
 	builder = None
 	window = None
 	
-	clients_denying_close = None
+	__unsaved_clients = None
 	
 	button_save_all = None
 	button_cancel = None
@@ -23,15 +23,15 @@ class UnsavedChangesHandler(object):
 	
 	delegate = None
 	
-	def __init__(self,clients_denying_close,delegate):
+	def __init__(self,unsaved_clients,delegate):
 		"""
 		Displays a window allowing the user to choose which tabs are saved, or if all of them are.
-		- clients_denying_close must have at least one item within it to ask the user.
+		- unsaved_clients must have at least one item within it to ask the user.
 		- delegate must be not null, it must also respond to the following:
 		  - unsaved_changes_handler_cb(resolution)
 		"""
-		assert None != clients_denying_close
-		assert len(clients_denying_close) > 0
+		assert None != unsaved_clients
+		assert len(unsaved_clients) > 0
 		assert None != delegate
 		
 		super(UnsavedChangesHandler, self).__init__()
@@ -51,14 +51,14 @@ class UnsavedChangesHandler(object):
 		assert None != self.button_dont_save
 		assert None != self.vbox
 		
-		self.__clients_denying_close = clients_denying_close
+		self.__unsaved_clients = unsaved_clients
 		self.delegate = delegate
 		
 		self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
 		self.window.set_deletable(False)
 		self.window.set_title("Save Changes?")
 		
-		for client in self.__clients_denying_close:
+		for client in self.__unsaved_clients:
 			
 			# We need to make a manual save row for the client.
 			client.__unsaved_hbox = gtk.HBox(spacing=10)
@@ -207,22 +207,22 @@ class UnsavedChangesHandler(object):
 		"""
 		assert None != parent
 		assert None != self.window
-		assert None != self.__clients_denying_close
+		assert None != self.__unsaved_clients
 		
 		self.window.set_modal(True)
 		self.window.set_transient_for(parent)
 		self.window.show()
 		
-		# Remove unsavable items from self.__clients_denying_close 
+		# Remove unsavable items from self.__unsaved_clients 
 		# so they don't deny close. This has to be done after 
 		# showing so that they are visable in the list none the less.
 		new_arr = []
-		for client in self.__clients_denying_close:
+		for client in self.__unsaved_clients:
 			status = client.GetSaveStatus()
 			if status != Client.SAVE_STATUS_UNSAVABLE:
 				new_arr.append(client)
 		
-		self.__clients_denying_close = new_arr
+		self.__unsaved_clients = new_arr
 	
 	def save_specific_client(self,client):
 		"""
@@ -239,18 +239,18 @@ class UnsavedChangesHandler(object):
 		"""
 		assert None != client
 		assert None != client.__unsaved_button_dontsave
-		assert None != self.__clients_denying_close
+		assert None != self.__unsaved_clients
 		assert None != self.window
 		assert None != self.delegate
 		
 		# Remove this client from the list so that it no longer denies close.
-		if client in self.__clients_denying_close:
-			self.__clients_denying_close.remove(client)
+		if client in self.__unsaved_clients:
+			self.__unsaved_clients.remove(client)
 		
 		client.__unsaved_button_dontsave.set_sensitive(False)
 		
 		# If there are no more tabs denying close, then return that everything has been "saved".
-		if len(self.__clients_denying_close) == 0:
+		if len(self.__unsaved_clients) == 0:
 			self.window.hide()
 			self.delegate.unsaved_changes_handler_cb(UnsavedChangesHandler.RETURN_SAVED_ALL)
 	
@@ -260,9 +260,9 @@ class UnsavedChangesHandler(object):
 		WARNING: If the user previously chose "Don't Save" that client WILL
 		NOT BE SAVED!!!
 		"""
-		assert None != self.__clients_denying_close
+		assert None != self.__unsaved_clients
 		
-		for client in self.__clients_denying_close:
+		for client in self.__unsaved_clients:
 			client.Save()
 	
 	def dont_save_all(self):
@@ -318,7 +318,7 @@ class UnsavedChangesHandler(object):
 		Called to update the status. Used to update the display once the client has finished saving.
 		"""
 		assert None != client
-		assert None != self.__clients_denying_close
+		assert None != self.__unsaved_clients
 		assert None != self.window
 		assert None != self.delegate
 		assert status in Client.SAVE_STATUS_RANGE
@@ -326,10 +326,10 @@ class UnsavedChangesHandler(object):
 		self.__update_client_status_visibility(client,status)
 		
 		if status == Client.SAVE_STATUS_SAVED:
-			self.__clients_denying_close.remove(client)
+			self.__unsaved_clients.remove(client)
 		
 		#print "update_client_status",client,status
-		if len(self.__clients_denying_close) == 0:
+		if len(self.__unsaved_clients) == 0:
 			self.window.hide()
 			self.delegate.unsaved_changes_handler_cb(UnsavedChangesHandler.RETURN_SAVED_ALL)
 
