@@ -5,6 +5,7 @@ import sys,os,argparse,time
 import gobject,pygtk,gtk,gio
 import dbus,dbus.service,dbus.mainloop.glib
 import subprocess,threading
+from pprint import pprint
 
 import Components.Client
 import Components.Host
@@ -82,7 +83,7 @@ class Base(object):
 		
 		self.plug.show_all()
 		
-		print "Prepare ID=",self.plug.get_id()
+		Components.Client.logger.info("Prepare plug for insertion, ID={0}".format(self.plug.get_id()))
 		
 		return self.plug.get_id()
 	
@@ -97,12 +98,12 @@ class Base(object):
 		return ret
 	
 	def notify_closed_by_host(self):
-		print "closed_by_host()"
+		Components.Client.logger.info("Remote host informed this client to close.")
 		gtk.main_quit()
 		pass
 	
 	def get_save_status(self):
-		print "save_status()"
+		Components.Client.logger.info("save_status()->{0}".format(self.__save_status))
 		return self.__save_status
 	
 	def set_save_status(self,status):

@@ -3,11 +3,13 @@
 
 import sys,os,argparse
 import gobject,pygtk,gtk,gio
+from Components import Client,Host
 gobject.threads_init ()
 
 from DemoClient import DemoClient
 
 client = None
+l = Client.logger
 
 def main():
 	global client
@@ -17,8 +19,10 @@ def main():
 	parser.add_argument('-o','--host',type=int,default=0,help="the PID that this client will embed itself into, if left out will spawn its own host")
 	args = parser.parse_args()
 	
-	# DBus
-	print "Client PID",os.getpid()
+	l.critical("===========================================================")
+	l.critical("Client {0} - A generic client example. Started.".format(os.getpid()))
+	l.critical("===========================================================")
+	l.info("GLADE_PREFIX is {0}".format(Client.glade_prefix))
 	
 	client = DemoClient(args.host)
 	gtk.main()

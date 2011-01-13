@@ -6,7 +6,11 @@ import gobject,pygtk,gtk,gio
 gobject.threads_init ()
 import dbus,dbus.service,dbus.mainloop.glib
 import Components
-from Components import Client
+from Components import Client,Host
+import logging
+from logging import debug,info,warning,error,critical,log,exception
+
+l = Host.logger
 
 class HostClient(object):
 	glade_prefix = ""
@@ -32,11 +36,6 @@ class HostClient(object):
 		super(HostClient, self).__init__()
 		self.delegate = delegate
 		
-		try:
-			self.glade_prefix = os.environ["GLADE_PREFIX"]
-		except KeyError:
-			print "No Glade Environment"
-		
 		self.bus = bus
 		self.remote = self.bus.get_object(Client.BUS_INTERFACE_NAME+"_"+str(pid),Client.BUS_OBJECT_PATH)
 		self.remote.connect_to_signal("TitleChanged",self.__cb_title_changed)
@@ -44,7 +43,7 @@ class HostClient(object):
 		self.remote.connect_to_signal("SaveStatusChanged",self.__cb_save_status_changed)
 		
 		self.builder = gtk.Builder()
-		self.builder.add_from_file(self.glade_prefix+"HostClient.glade")
+		self.builder.add_from_file(Host.glade_prefix+"HostClient.glade")
 		
 		self.widget = gtk.VBox()
 		self.widget.add_events(gtk.gdk.STRUCTURE_MASK)
@@ -78,8 +77,9 @@ class HostClient(object):
 	
 	def __widget_map(self,sender):
 		if self.has_remote == False:
-			print "map event"
-			self.socket.add_id(self.Prepare())
+			plug_id = self.Prepare()
+			l.info("Insert new remote xid of {0}.".format(plug_id))
+			self.socket.add_id(plug_id)
 			self.has_remote = True
 		return False
 	
@@ -87,7 +87,7 @@ class HostClient(object):
 		self.has_remote = False
 		self.widget.pack_start(self.crashbox)
 		self.widget.show_all()
-		print "plug-removed"
+		l.info("Remote xid disconnected.")
 		return False
 	
 	def Prepare(self):
@@ -161,7 +161,7 @@ class HostClient(object):
 		pass
 	
 	def __cb_save_status_changed(self,status):
-		self.delegate.update_save_status(self,status)
+		self.delegate.update_client_status(self,status)
 		pass
 
 

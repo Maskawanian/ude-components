@@ -1,10 +1,12 @@
 import sys,os
 import gobject,pygtk,gtk,gio,pango
-from Components import Client
+from Components import Client,Host
+import logging
 gobject.threads_init ()
 
+l = Host.logger
+
 class UnsavedChangesHandler(object):
-	glade_prefix = ""
 	builder = None
 	window = None
 	
@@ -18,13 +20,10 @@ class UnsavedChangesHandler(object):
 	
 	def __init__(self,clients_denying_close,delegate):
 		super(UnsavedChangesHandler, self).__init__()
-		try:
-			self.glade_prefix = os.environ["GLADE_PREFIX"]
-		except KeyError:
-			print "No Glade Environment"
+		#Host.logger.debug("__init__(self={0},clients_denying_close={1},delegate={2})".format(self,clients_denying_close,delegate))
 		
 		self.builder = gtk.Builder()
-		self.builder.add_from_file(self.glade_prefix+"UnsavedChangesHandler.glade")
+		self.builder.add_from_file(Host.glade_prefix+"UnsavedChangesHandler.glade")
 		self.window = self.builder.get_object("window")
 		self.button_save_all = self.builder.get_object("buttonSaveAll") 
 		self.button_cancel = self.builder.get_object("buttonCancel") 
@@ -41,7 +40,6 @@ class UnsavedChangesHandler(object):
 		#self.window.set_decorated(False)
 		
 		for client in self.clients_denying_close:
-			
 			
 			# We need to make a manual save row for the client.
 			client.__unsaved_hbox = gtk.HBox(spacing=10)
@@ -67,7 +65,7 @@ class UnsavedChangesHandler(object):
 			client.__unsaved_button_save.connect("clicked",self.__cb_save_specific_client,client)
 			client.__unsaved_button_save.set_size_request(100,-1)
 			client.__unsaved_button_save_as = gtk.Button("Save As...")
-			#client.__unsaved_button_save.connect("clicked",self.__cb_save_specific_client,client)
+			#client.__unsaved_button_save_as.connect("clicked",self.__cb_saveas_specific_client,client)
 			client.__unsaved_button_save_as.set_size_request(100,-1)
 			client.__unsaved_button_cant_save = gtk.Button("Not Savable")
 			client.__unsaved_button_cant_save.set_size_request(210,-1)
@@ -84,19 +82,20 @@ class UnsavedChangesHandler(object):
 			self.vbox.pack_start(client.__unsaved_hbox,expand=False)
 			
 			description = client.GetDescription()
-			print "!!!!!!!!!!!!!!!description",description
 			client.__unsaved_label.set_markup(description.replace("&","&amp;"))
 			
 			client.__unsaved_hbox.show()
 			client.__unsaved_label.show()
 			
-			self.__update_status_visibility(client)
+			self.__update_client_status_visibility(client)
 			
 		self.button_save_all.connect("clicked",self.__cb_save_all)
 		self.button_cancel.connect("clicked",self.__cb_cancel)
 		self.button_dont_save.connect("clicked",self.__cb_dont_save_all)
 	
-	def __update_status_visibility(self,client,status=None):
+	def __update_client_status_visibility(self,client,status=None):
+		#l.debug("__update_client_status_visibility(self={0},client={1},status={2})".format(self,client,status))
+		
 		if status==None:
 			status = client.GetSaveStatus()
 		
@@ -141,6 +140,8 @@ class UnsavedChangesHandler(object):
 			client.__unsaved_button_cant_save.show()
 	
 	def show(self,parent):
+		#l.debug("show(self={0},parent={1})".format(self,parent))
+		
 		self.window.set_modal(True)
 		self.window.set_transient_for(parent)
 		self.window.show()
@@ -158,9 +159,13 @@ class UnsavedChangesHandler(object):
 		pass
 	
 	def save_specific_client(self,client):
+		#l.debug("save_specific_client(self={0},client={1})".format(self,client))
+		
 		client.Save()
 	
 	def dont_save_specific_client(self,client):
+		#l.debug("dont_save_specific_client(self={0},client={1})".format(self,client))
+		
 		if client in self.clients_denying_close:
 			self.clients_denying_close.remove(client)
 		
@@ -171,17 +176,26 @@ class UnsavedChangesHandler(object):
 			self.delegate.unsaved_changes_handler_return(UnsavedChangesHandler.RETURN_SAVED_ALL)
 	
 	def save_all(self):
+		#l.debug("save_all(self={0})".format(self))
+		
 		for client in self.clients_denying_close:
 			client.Save()
 	
 	def dont_save_all(self):
+		#l.debug("dont_save_all(self={0})".format(self))
+		
 		self.window.hide()
 		self.delegate.unsaved_changes_handler_return(UnsavedChangesHandler.RETURN_SAVED_ALL)
 	
 	def cancel(self):
+		#l.debug("cancel(self={0})".format(self))
+		
 		self.window.hide()
 		self.delegate.unsaved_changes_handler_return(UnsavedChangesHandler.RETURN_CANCEL)
 	
+	#
+	# BUTTON EVENT CALLBACKS
+	#
 	def __cb_save_specific_client(self,sender,client):
 		self.save_specific_client(client)
 		
@@ -201,12 +215,17 @@ class UnsavedChangesHandler(object):
 		self.cancel()
 		return True # Stop Delete
 	
-	def update_save_status(self,client,status):
-		self.__update_status_visibility(client,status)
+	#
+	# REMOTE NOTIFICATIONS
+	#
+	def update_client_status(self,client,status):
+		#l.debug("update_save_status(self={0},client={1},status={2})".format(self,client,status))
+		
+		self.__update_client_status_visibility(client,status)
 		if status == Client.SAVE_STATUS_SAVED:
 			self.clients_denying_close.remove(client)
 		
-		print "update_save_status",client,status
+		#print "update_client_status",client,status
 		if len(self.clients_denying_close) == 0:
 			self.window.hide()
 			self.delegate.unsaved_changes_handler_return(UnsavedChangesHandler.RETURN_SAVED_ALL)

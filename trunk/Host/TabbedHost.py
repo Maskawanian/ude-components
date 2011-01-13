@@ -8,6 +8,9 @@ from HostClient import HostClient
 from UnsavedChangesHandler import UnsavedChangesHandler
 from ComponentHostDBus import ComponentHostDBus
 from Components import Client,Host
+import logging
+
+l = Host.logger
 
 class TabbedHost(object):
 	bus = None
@@ -43,13 +46,8 @@ class TabbedHost(object):
 		assert self.bus_service_name != None
 		assert self.bus_obj != None
 		
-		try:
-			self.glade_prefix = os.environ["GLADE_PREFIX"]
-		except KeyError:
-			print "No Glade Environment"
-		
 		self.builder = gtk.Builder()
-		path = self.glade_prefix+"TabbedHost.glade"
+		path = Host.glade_prefix+"TabbedHost.glade"
 		assert os.path.exists(path)
 		self.builder.add_from_file(path)
 		
@@ -78,11 +76,11 @@ class TabbedHost(object):
 				clients_denying_close.append(client)
 				deny_close = True
 		
-		self.__uch = UnsavedChangesHandler(clients_denying_close,self)
-		self.__uch.show(self.window)
+		l.info("deny_close {0}".format(deny_close))
 		
-		print "deny_close",deny_close
 		if deny_close:
+			self.__uch = UnsavedChangesHandler(clients_denying_close,self)
+			self.__uch.show(self.window)
 			return True # Stop Delete
 		
 		# Tell all the clients to quit.
@@ -93,7 +91,7 @@ class TabbedHost(object):
 		return False
 	
 	def unsaved_changes_handler_return(self,resolution):
-		print "unsaved_changes_handler_return",resolution
+		l.info("unsaved_changes_handler_return {0}".format(resolution))
 		self.__uch = None
 		
 		if resolution == UnsavedChangesHandler.RETURN_SAVED_ALL:
@@ -104,9 +102,9 @@ class TabbedHost(object):
 			gtk.main_quit()
 		pass
 	
-	def update_save_status(self,client,status):
+	def update_client_status(self,client,status):
 		if self.__uch:
-			self.__uch.update_save_status(client,status)
+			self.__uch.update_client_status(client,status)
 	
 	def do_add_pid_clicked(self,sender):
 		self.add_pid(int(self.entry.get_text()))
