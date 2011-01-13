@@ -37,7 +37,7 @@ class HostClient(object):
 		self.delegate = delegate
 		
 		self.bus = bus
-		self.remote = self.bus.get_object(Client.BUS_INTERFACE_NAME+"_"+str(pid),Client.BUS_OBJECT_PATH)
+		self.remote = self.bus.get_object(Client.BUS_INTERFACE_NAME_PID_FORMAT.format(pid),Client.BUS_OBJECT_PATH)
 		self.remote.connect_to_signal("TitleChanged",self.__cb_title_changed)
 		self.remote.connect_to_signal("ProxyIconChanged",self.__cb_proxy_icon_changed)
 		self.remote.connect_to_signal("SaveStatusChanged",self.__cb_save_status_changed)

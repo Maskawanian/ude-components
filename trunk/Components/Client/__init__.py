@@ -11,6 +11,7 @@ SAVE_STATUS_UNSAVABLE           = 4 # If we close this we will lose data, we are
 SAVE_STATUS_RANGE               = range(SAVE_STATUS_SAVED,SAVE_STATUS_UNSAVABLE+1)
 
 BUS_INTERFACE_NAME = "org.ude.components.client"
+BUS_INTERFACE_NAME_PID_FORMAT = BUS_INTERFACE_NAME+"_{0}"
 BUS_OBJECT_PATH = "/org/ude/components/client"
 
 import logging,os
